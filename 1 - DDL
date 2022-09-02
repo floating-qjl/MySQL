@@ -87,9 +87,27 @@ LONGTEXT   0-4294967295 bytes 极大文本数据
  
 
  
- 
+删除表
+1.删除表
+DROP TABLE表名;
+2.删除表时判断表是否存在
+DROP TABLE IF EXISTS 表名;
+
+
  
 
+
+修改表
+1.修改表名
+ALTER TABLE 表名 RENAME TO 新的表名;
+2.添加—列
+ALTER TABLE 表名 ADD 列名 数据类型;
+3.修改数据类型
+ALTER TABLE 表名 MODIFY 列名 新数据类型;
+4.修改列名和数据类型
+ALTER TABLE 表名 CHANGE 列名 新列名 新数据类型;
+5.删除列
+ALTER TABLE 表名 DROP 列名;
 
 
 
