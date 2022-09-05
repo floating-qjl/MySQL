@@ -1,0 +1,61 @@
+查询语法:
+
+SELECT
+    字段列表
+FROM
+    表名列表
+WHERE
+    条件列表
+GROUP BY 
+    分组字段
+HAVING
+    分组后条件
+ORDER BY
+    排序字段
+LIMIT
+    分页限定
+
+
+
+·基础查询
+
+1.查询多个字段
+    SELECT 字段列表 FROM 表名;
+    SELECT * FROM 表名; 查询所有列的数据，列名的列表可以使用*替代，不建议使用
+
+2.去除重复记录
+    SELECT DISTINCT 字段列表 FROM 表名;
+    
+3.起别名
+    AS; AS 也可以省略（在字段名后使用，可以在显示的时候更改展示的字段名）
+
+
+·条件查询(HERE)
+
+1.条件查询语法
+    SELECT 字段列表 FROM 表名 WHERE 条件列表;
+
+2.条件
+符号                                               功能
+
+>                                                  大于
+<                                                  小于
+>=                                                大于等于
+<=                                                小于等于
+=                                                  等于
+<>或!=                                            不等于
+BETWEEN ...AND ...                             在某个范围之内(都包含)
+IN(...)                                           多选一
+LIKE 占位符                             模糊查询_单个任意字符%多个任意字符
+lS NULL                                           是NULL
+IS NOT NULL                                      不是NULL
+AND或&&                                            并且
+OR或|l                                             或者
+NOT或!                                           非，不是
+
+
+·分组查询(GROUP BY)
+·排序查询(ORDER BY)
+·分页查询(LIMIT)
+
+
