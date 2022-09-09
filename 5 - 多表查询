@@ -5,7 +5,7 @@ select * from emp , dept; -- 会产生笛卡尔积，即两个组合的所有数
 
 
 -- 清除无效数据
-select * from emp , dept where emp.dep_id = dept.did; -- 相当于内连接
+    select * from emp , dept where emp.dep_id = dept.did; -- 相当于内连接
 -- 可使用 where 添加条件以达到目的
 
 
@@ -26,13 +26,67 @@ select * from emp , dept where emp.dep_id = dept.did; -- 相当于内连接
 
 内连接
 1.内连接查询语法
---隐式内连接
-SELECT 字段列表 FROM 表1,表2... WHERE 条件;
+  --隐式内连接
+  SELECT 字段列表 FROM 表1,表2... WHERE 条件;
+
+演示：
+SELECT
+t1.NAME,t1.gender,t2.dname
+FROM
+emp t1,dept t2    -- 起别名
+WHERE
+t1.dep_id = t2.did;
+
 
 --显示内连接
-SELECT 字段列表 FROM 表1 [INNER] J0IN 表2 ON 条件;
+SELECT 字段列表 FROM 表1 [INNER] J0IN 表2 ON 条件; -- inner 可以省略
 
 内连接相当于查询AB交集数据
+
+
+
+
+外连接
+1.外连接查询语法
+  --左外连接
+  SELECT 字段列表 FROM 表1 LEFT [OUTER] J0IN 表2 ON 条件;
+  --右外连接
+  SELECT 字段列表 FROM 表1 RIGHT [OUTER] J0IN 表2 ON 条件;
+  
+左外连接:相当于查询A表所有数据和交集部分数据
+右外连接:相当于查询B表所有数据和交集部分数据
+
+
+
+
+
+
+子查询
+1.子查询概念:
+  查询中嵌套查询，称嵌套查询为子查询
+
+2.子查询根据查询结果不同，作用不同:
+  ·单行单列
+  ·多行单列
+  ·多行多列
+
+
+子查询根据查询结果不同，作用不同:
+  ·单行单列:作为条件值，使用 =!,=,>,< 等进行条件判断
+    SELECT 字段列表 FROM 表 WHERE 字段名 = (子查询);
+    
+  ·多行单列:作为条件值，使用in等关键字进行条件判断
+    SELECT 字段列表 FROM 表 WHERE 字段名 in (子查询);
+
+  ·多行多列:作为虚拟表
+    SELECT 字段列表 FROM (子查询) WHERE 条件;
+
+
+
+
+
+
+
 
 
 
