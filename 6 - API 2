@@ -33,3 +33,72 @@ ResultSet
 
 
 
+
+PreparedStatement:
+  .PreparedStatement作用:
+    1.预编译SQL语句并执行:预防SQL注入问题
+    
+  .SQL注入
+    .SQL注入是通过操作输入来修改事先定义好的SQL语句，用以达到执行代码对服务器进行攻击的方法。
+
+String pwd*** = "' or '1' ='1'";
+
+String name = "zhangsan";
+String pwd = "123";
+String sql = "select * from tb_user where username = '"+name+"' and passowrd = '"+pwd+"'";
+
+
+
+
+. PreparedStatement作用:
+     1.预编译SQL并执行SQL语句
+    
+  1、获取PreparedStatement对象
+     //SQL语句中的参数值，使用?占位符替代
+     String sql = "select * from user where username = ? and password = ?";
+     
+     //通过Connection对象获取，并传入对应的sql语句
+     PreparedStatement pstmt = conn.prepareStatement(sql);
+  2、设置参数值
+     PreparedStatement对象:setXxx(参数1，参数2):给?赋值
+       Xxx:数据类型;如setInt(参数1，参数2)
+       参数:
+         参数1:?的位置编号，从1开始
+         参数2:?的值
+  3、执行SQL
+     executeUpdate(); //executeQuery(); 不需要再传递sql
+
+
+
+
+
+    Str1ng name = "zhangsan" ;
+    String pwd = "' or '1' = '1";
+    //定义sql
+    String sql = "select * from tb_user where username = ? and password = ?";
+    //获取pstmt对象
+    PreparedStatement pstmt = conn.prepareStatement(sql);
+    //设置?的值
+    pstmt.setstring( 1, name);
+    pstmt.setstring( 2, pwd);
+    //执行sql
+    Resultset rs = pstmt.executeQuery();
+
+    设置参数之后，就可以将里面的字符串转义掉，将其变成一般的文本文件，以实现防sql注入
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
