@@ -1,0 +1,80 @@
+数据库连接池简介：
+·数据库连接池是个容器，负责分配、管理数据库连接(Connection)
+·它允许应用程序重复使用一个现有的数据库连接，而不是再重新建立一个;
+·释放空闲时间超过最大空闲时间的数据库连接来避免因为没有释放数据库连接而引起的数据库连接遗漏。
+
+好处:
+·资源重用
+·提升系统响应速度
+.避免数据库连接遗漏
+
+
+
+数据库连接池实现:
+.标准接口:DataSource
+  ·官方(SUN)提供的数据库连接池标准接口，由第三方组织实现此接口。
+  .功能:获取连接
+        Connection getConnection()
+        
+常见的数据库连接池:
+. DBCP
+. C3PO
+. Druid
+
+Druid(德鲁伊):
+.Druid连接池是阿里巴巴开源的数据库连接池项目
+·功能强大，性能优秀，是Java语言最好的数据库连接池之一
+
+
+
+
+
+Driud使用步骤
+1.导入jar包, druid-1.1.12.jar
+2.定义配置文件
+3．加载配置文件
+4.获取数据库连接池对象5．获取连接
+
+配置文件：
+  .druid.properties
+      .driverclassName=com.mysql.jdbc.Driver
+       url=jdbc: mysql:///db1?usesSL=false&useServerPrepStmts=true
+       username=root
+       password=1234
+       # 初始化连接数量
+       initialsize=5
+       # 最大连接数
+       maxActive=10
+       # 最大等待时间
+       maxWait=3000
+
+还有很多配置，可自行搜索
+
+
+代码：
+System.out.println(System.getProperty("user.dir"));  //以此获取当前模块的路径，来决定在下方加载配置文件的路径是否要添加主项目路径
+
+//3.加载配置文件
+Properties prop = new Properties();
+prop.load(new FiLeInputStream("jdbc-demo/src/druid.properties"));
+//4.获取连接池对象
+DataSource dataSource = DruidDataSourceFactory.createDataSource (prop) ;
+//5.获取数据库连接Connection .
+Connection connection = dataSource.getConnection() ;
+System.out.printLn(connection);
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
