@@ -1,0 +1,53 @@
+
+使用坐标导入jar包
+1．在pom.xml中编写<dependencies>标签
+2．在<dependencies>标签中使用<dependency>引入坐标
+3．定义坐标的groupld，artifactld,version
+4．点击刷新按钮，使坐标生效
+
+
+<dependencies>
+  <!-- mysql坐标—->
+  <dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>5.1.32</version>
+  </dependency>
+</dependencies>
+
+
+
+
+
+依赖范围
+
+通过设置坐标的依赖范围(scope)，可以设置对应jar包的作用范围:编译环境、测试环境、运行环境
+
+<dependency>
+  <groupId>junit</groupId>
+  <artifactId>junit</artifactId>
+  <version>4. 13</version>
+  <scope>test</scope>
+</dependency>
+
+依赖范围   编译classpath    测试classpath    运行classpath    例子
+compile         Y               Y                 Y         logback
+test            -               Y                 -          Junit
+provided        Y               Y                 -        servlet-api
+runtime         -               Y                 Y         jdbc驱动
+system          Y               Y                 -     存储在本地的jar包
+import               引入DependencyManagement
+
+<scope>默认值:compile
+
+
+
+
+
+
+
+
+
+
+
+
