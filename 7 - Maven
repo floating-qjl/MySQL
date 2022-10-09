@@ -81,6 +81,50 @@ Maven生命周期
 
 
 
+IDEA配置Maven环境
+1．选择IDEA中 File --> Settings
+2．搜索maven
+3．设置IDEA使用本地安装的Maven，并修改配置文件路径
+
+
+
+
+
+Maven坐标详解:
+
+什么是坐标?
+  Maven中的坐标是资源的唯一标识
+  使用坐标来定义项目或引入项目中需要的依赖
+
+
+Maven坐标主要组成:
+  groupld:定义当前Maven项目隶属组织名称(通常是域名反写，例如: com.itheima)
+  artifactld:定义当前Maven项目名称（通常是模块名称，例如order-service、goods-service)
+  version:定义当前项目版本号
+
+
+
+IDEA导入Maven项目
+1．选择右侧Maven面板，点击＋号
+2．选中对应项目的pom.xml文件，双击即可
+3．如果没有Maven面板，选择 View → Appearance →Tool Window Bars
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
