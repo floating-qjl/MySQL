@@ -1,0 +1,45 @@
+
+目的：
+    解决原生方式中的硬编码
+    简化后期执行SQL
+
+
+优势：
+    它不依赖于字符串字面值，会更安全一点;
+    如果你的IDE有代码补全功能，那么代码补全可以帮你快速选择到映射好的SQL语句。
+    
+    
+    
+
+使用Mapper代理方式完成入门案例:
+    1.定义与SQL映射文件同名的 Mapper 接口，并且将 Mapper 接口和SQL映射文件放置在同一目录下
+    2.设置SQL映射文件的 namespace 属性为 Mapper 接口全限定名
+    3.在 Mapper 接口中定义方法，方法名就是SQL映射文件中sql语句的id，并保持参数类型和返回值类型一致
+    4.编码
+        1.通过 SqlSession 的 getMapper 方法获取 Mapper 接口的代理对象
+        2.调用对应方法完成sql 的执行
+
+
+
+细节:如果 Mapper 接口名称和SQL映射文件名称相同，并在同一目录下，则可以使用包扫描的方式简化SQL映射文件的加载
+
+<mappers>
+    <!—-加载sql的映射文件-->
+    <! --<mapper resource="com/itheima/mapper2/UserMapper.xml"/>-->
+    <package name="com.itheima.mapper"/>
+</mappers>
+
+
+
+
+提示：
+    1.在resourses文件下建立与编译环境中相同名称的接口的同一结构的包（directory），注意这里的规则不能再使用“.”，
+      而应该使用“/”来分隔，并将相应配置文件放进去，在编译之后因为同名和同结构，两个文件会整合成一个，class文件和xml文件也会出现在一起
+    2.在 xml 文件中，定义namespace空间名为编译环境中 完整包名 + class文件名
+    3.返回值类型就是 xml 文件中的 resultType 中的最后一个文件类，并根据sql语句判定接口中是否使用集合
+
+
+
+
+
+
