@@ -1,0 +1,31 @@
+
+environments:配置数据库连接环境信息。可以配置多个environment，通过default属性切换不同的environment
+
+
+MyBatis核心配置文件的顶层结构如下:
+configuration(配置)
+    properties(属性)
+    settings(设置)
+    typeAliases(类型别名)
+    typeHandlers(类型处理器)
+    objectFactory (对象工厂)
+    plugins(插件)
+    environments(环境配置)
+        environment(环境变量)
+            transactionManager(事务管理器)
+            dataSource(数据源)
+    databaseldProvider (数据库厂商标识)
+    mappers(映射器)
+
+
+
+类型别名(typeAliases)
+<typeAliases >
+    <package name="com.itheima.pojo"/>
+</typeAliases>
+
+此别名可以使另一个配置文件中返回类型（resultType）省去前面的包名
+一部分基础类型已经自动写好了别名，可在官网查询到
+
+细节:配置各个标签时，需要遵守前后顺序
+
