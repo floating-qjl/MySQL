@@ -20,3 +20,71 @@
     安装MyBatisX插件（快速开发mybatis）
 
 
+
+MyBatisX插件：
+1.Mybatis×是一款基于IDEA的快速开发插件，为效率而生。
+2.主要功能：
+    XML和接口方法相互跳转
+    根据接口方法生成statement
+3.安装
+
+
+
+
+查询所有数据：
+1.编写接口方法: Mapper接口
+  参数:无
+  结果:List<Brand>
+2.编写SQL语句:SQL映射文件
+3.执行方法，测试
+
+List<Brand> selectAll();
+
+<select id="selectAll resultType="brand">
+  select * from tb_brand;
+</select>
+
+
+MyBatis完成操作需要几步?
+    三步:编写接口方法-->编写sQL -->执行方法
+
+
+数据库表的字段名称和实体类的属性名称不一样，则不能自动封装数捱
+解决方法：1.起别名：为不一样的列名起别名，让别名和实体类的属性名一样
+              select id,brand_name as brandName，company_hame as companyName，ordered，description,status from tb_brand;
+              缺点：每次查询都要起别名，不方便
+            
+          2.sql片段：
+              <sql id="brand_column">
+                  id, brand_name as brandName,company_name as companyName，ordered,description，status
+              </sql>
+
+              <select id="selectAll" resultType="brand">
+                  select <include refid="brand_column"/> from tb_brand;
+              </select>
+              可以借助以上代码实现sql片段，但是不够灵活，每次只能查询固定的范围
+           
+          3.resultMap：
+              定义<resultMap>标签
+              在<select>标签中，使用resultMap属性替换resultType属性
+
+              //id表示唯一标识
+              //type表示映射的类型，支持别名
+              
+              <resultMap id="brandResultMap" type="brand">
+                  <result column="brand_name" property="brandName"/>
+                  <result column="company_name" property="companyName"/>
+                  
+                  //result   用于一般字段
+                  //id       用于主键字段
+                  //column   表的列名
+                  //property 实体类的属性名
+              </resultMap>
+              
+              <select id="selectAll" resultMap="brandRexultMap">
+                  select * from tb_brand;
+              </select>
+
+
+
+
