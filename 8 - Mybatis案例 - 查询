@@ -88,3 +88,57 @@ MyBatis完成操作需要几步?
 
 
 
+
+
+查看详情：
+
+1.编写接口方法:Mapper接口
+  参数:id
+  结果:Brand
+2.编写SQL语句:SQL映射文件
+3.执行方法，测试
+
+
+
+Brand selectByld(int id);
+
+<select id="selectByld" parameterType="int" resultType="brand">
+  select * from tb_brand where id = #{id};
+</select>
+
+
+
+火参数占位符:
+1．#{}:执行sQL时，会将#{}占位符替换为?,将来自动设置参数值
+2．${}:拼sql。会存在SQL注入问题
+3．使用时机:
+   *参数传递的时候:#{}
+   *表名或者列名不固定的情况下或进行动态设置以达到sql拼接的效果：${}，会存在SQL注入问题
+   
+*参数类型:parameterType:可以省略
+*特殊字符处理:
+   1.转义字符: &lt 为 "<" 号
+   2.CDATA区：<![CDATA[内容]]>，idea中可使用 CD ，会有提示
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
