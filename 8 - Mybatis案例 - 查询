@@ -124,9 +124,64 @@ Brand selectByld(int id);
 
 
 
+条件查询
+
+1.多条件查询：
+  编写接口方法: Mapper接口
+      参数:所有查询条件
+      结果:List<Brand>
+  编写SQL语句: SQL映射文件
+  执行方法，测试
+
+参数接收
+1．散装参数:如果方法中有多个参数，需要使用@Param("SQL参数占位符")
+2．对象参数
+3. map集合参数
+
+List<Brand> selectByCondition(@Param("status")int status,@Param("companyName") StringcompanyName, @Param("brandName") String brandName);
+
+//接收参数
+int status = 1;
+String companyName ="华为";
+String brandName ="华为";
+//处理参数
+companyName = "%" +companyName + "%";
+brandName = "%" +companyNamel+"%";
 
 
 
+//封装对象
+List<Brand> selectByCondition(Brand brand);
+
+Brand brand = new Brand();
+brand.setStatus(status);
+brand.setCompanyName(companyName);
+brand. setBrandName (brandName);
+
+
+//map集合
+List<Brand> selectByCondition(Map map);
+
+Map map = new HashMap();
+map.put("status", status);
+map.put("companyName", companyName);
+map.put("brandName" , brandName);
+
+
+
+sql语句：
+
+<select id="selectByCondition" resultMap="brandResultMap">
+  select *
+  from tb_brand 
+  where
+    status = #{status}
+    and company_name like #{companyName}
+    and brand_name like #{brandName}
+</select>
+
+
+//这种方法有bug，若用户不想输入三个条件而只输入一个或者两个，则会出错
 
 
 
