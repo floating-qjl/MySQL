@@ -188,10 +188,33 @@ sql语句：
 
 
 
+动态条件查询：
+
+SQL语句会随着用户的输入或外部条件的变化而变化，我们称为动态SQL
+
+MyBatis 对动态SQL有很强大的支撑:
+if
+choose (when, otherwise)
+trim (where, set)
+foreach
 
 
 
-
+<select id="selectByCondition" resultMap="brandResultMap">
+    select *
+    from tb_brand
+    where
+    <if test="status != null">
+        status = #{status}
+    </if>
+    <if test="companyName != null and companyName != '' ">
+        and company_name like #{companyName}
+    </if>
+    <if test="brandName != null and brandName != '' ">
+        and brand_name like #{brandName}
+    </if>
+    
+</select>
 
 
 
