@@ -190,6 +190,8 @@ sql语句：
 
 动态条件查询：
 
+
+多条件动态查询：
 SQL语句会随着用户的输入或外部条件的变化而变化，我们称为动态SQL
 
 MyBatis 对动态SQL有很强大的支撑:
@@ -215,6 +217,99 @@ foreach
     </if>
     
 </select>
+
+
+动态条件查询
+  if:条件判断
+     test:逻辑表达式
+  问题：第一个条件不写，则剩余两个的sql语句前会多出一个and，造成报错
+        select * from tb_brand where and company_name like ？
+        
+  解决方法：1.恒等式
+              select * from tb_brand where 1 = 1
+              <if test="status != null">
+                  and status = #{status}</if>
+              </if>
+              <if test="companyName != null and companyName != '' ">
+                  and company_name like #{companyName}
+              </if>
+              <if test="brandName != null and brandName != '' ">
+                  and brand_name like #{brandName}
+              </if>
+              
+            2.<where> 替换 where  可以自动添加 where 并且删除多余的 and
+              select * from tb_brand 
+              <where>
+              
+                <if test="status != null">
+                    and status = #{status}</if>
+                </if>
+                <if test="companyName != null and companyName != '' ">
+                    and company_name like #{companyName}
+                </if>
+                <if test="brandName != null and brandName != '' ">
+                    and brand_name like #{brandName}
+                </if>
+              </where>
+              
+          
+
+动态sQL
+if:用于判断参数是否有值，使用test属性进行条件判断
+       *存在的问题:第一个条件不需要逻辑运算符
+       *解决方案:
+           1) 使用恒等式让所有条件格式都一样
+           2) <where>标签替换where关键字
+
+
+
+
+
+
+单条件动态查询：
+
+从多个条件中选择一个
+choose (when, otherwise):选择，类似于Java中的switch语句
+
+<select id="selectByConditionSingle" resultMap="brandResultMap">
+  select*
+  from tb_brand
+  where
+  <choose> 
+  <!--类似于switch->
+      <when test="status != null"><--类似于case-->
+          status = tf{status}
+      </when>
+      <when test="companyName != null and companyName != ''">
+          company_name like #{companyName}
+      </when>
+      <when test="brandName != null and brandName != ''">
+          brand_name like #{brandName}
+      </when>
+      <otherwise> <1--类似于default-->
+          1=1
+      </otherwise>
+  </choose>
+</select>
+
+otherwise为了防止传入的条件为空
+
+  select*
+  from tb_brand
+  <where>
+    <choose> <!--类似于switch->
+      <when test="status != null"><--类似于case-->
+          status = tf{status}
+      </when>
+      <when test="companyName != null and companyName != ''">
+          company_name like #{companyName}
+      </when>
+      <when test="brandName != null and brandName != ''">
+          brand_name like #{brandName}
+      </when>
+    </choose>
+  </where>
+
 
 
 
