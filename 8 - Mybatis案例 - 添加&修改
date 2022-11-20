@@ -1,0 +1,143 @@
+添加：
+  1．编写接口方法: Mapper接口    void add(Brand brand);
+     参数:除了id之外的所有数据
+     结果: void
+     
+  2．编写SQL语句:SQL映射文件
+  <insert id="add">
+    insert into tb_brand (brand_name, company_name, ordered, description, status)
+    values(#{brandName},#{companyName},#{ordered},#{description},#{status})；
+  </insert>
+
+  3．执行方法，测试. 
+     MyBatis事务:
+       openSession():默认开启事务，进行增删改操作后需要使用
+       sqlSession.commit(); 手动提交事务
+       openSession(true):可以设置为自动提交事务(关闭事务)
+
+
+默认会将自动提交关掉，即就算添加代码正常运行也会回滚，导致数据库表单里实际上没有出现变化
+若想自动提交，可在获取SqlSession对象时做出更改 SqlSession sqlsession = sqlSessionFactory.opensession(true) ;
+
+
+
+
+在数据添加成功后，需要获取插入数据库数据的主键的值
+  比如:添加订单和订单项
+  1.添加订单
+  2.添加订单项，订单项中需要设置所属订单的id
+
+
+主键返回：
+
+一般情况下，是无法直接通过 getid() 这个方法来获取 id 的，这也导致获取到的是空值，可能会对之后的协同操作制造障碍
+因此可以使用：
+
+<insert id="addOrder" useGeneratedKeys="true" keyProperty="id">
+  insert into tb_order (payment, payment_type, status)
+  values (#{payment},#{paymentType}, #{status});
+</insert>
+
+<insert id="addOrderltem">
+  insert into tb_order_item (goods_name, goods_price, count,order_id)
+  values(#{goodsName},#goodsPrice}, #{count}, #{orderld});
+</insert>
+
+
+
+
+
+
+
+
+
+修改：
+
+修改全部字段：
+
+1.编写接口方法: Mapper接口
+  参数:所有数据
+  结果:void,
+2.编写SQL语句:SQL映射文件
+3.执行方法，测试
+
+void update(Brand brand);
+
+<update id="update">
+  update tb_brand
+  set brand_name = #{(brandName},
+      company_name = #{companyName},
+      ordered = #{ordered},
+      description = #(description},
+      status = #tstatus}
+  where id = #(id};
+</update>
+
+
+
+
+修改动态字段：
+
+1.编写接口方法: Mapper接口
+  参数:部分数据，封装到对象中
+  结果: void
+2.编写SQL语句:SQL映射文件
+3．执行方法，测试
+
+<update id="update">
+    update tb_userset
+      username =#{username},
+      password = #{password},
+      gender = #{gender},
+      addr = #{addr}
+    where
+      id = #{id}
+</update>
+
+以上代码若用户不进行完全修改，则会报错
+
+<update id="update">
+  update tb_brand
+  <set>
+    <if test="brandName != null and brandName != ''">
+      brand_name = #{brandName},
+    </if>
+    <if test="companyName != null and companyName !=''">
+      company_name = #{companyName},
+    </if>
+    <if test="ordered != null">
+      ordered = #{ordered},
+    </if>
+    <if test="description != null and description != ''">
+      description = #{description},
+    </if>
+    <if test="status != null">
+      status = #{status}
+    </lif>
+  </set>
+  where id = #{id};
+</update>
+
+
+一般而言，若 state 为空，则会多出一个逗号，若所有字段为空，且使用的为set关键字，最后会变成 update tb_brand set 导致不完整报错
+因此使用<set>标签来规避这些错误
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
