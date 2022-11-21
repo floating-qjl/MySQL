@@ -1,0 +1,61 @@
+删除一个：
+
+1.编写接口方法: Mapper接口
+  参数:id
+  结果:void
+2.编写SQL语句:SQL映射文件
+3.执行方法，测试
+
+void deleteByld(int id);
+
+<delete id="deleteByld">
+  delete from tb_brand where id = #{id}
+</delete>
+
+
+
+
+
+批量删除：
+
+1.编写接口方法:Mapper接口
+  参数:id数组
+  结果:void
+2.编写SQL语句:SQL映射文件
+3．执行方法，测试
+
+void deleteByIds(@Param("ids") int[]ids);
+
+<delete id="deleteBylds">
+  delete from tb_brandwhere id in (?,?,?)
+</delete>
+
+这里不能确定应该有几个问号，所以需要使用动态操作进行删除
+
+<delete id="deleteBylds">
+  delete from tb_brand
+  where id in
+  <foreach collection="ids" item="id" separator="." open="(" close=")">
+    #{id}
+  </foreach>
+</delete>
+
+标签内分别为：数组/集合、属性元素、占位符、开始自动添加、结束自动添加
+
+mybatis会将数组参数、封装为一个Map集合。
+  默认: array =数组
+  使用@Param注解改变map集合的默认key的名称
+  
+若既不使用 foreach collection="array"，也不使用 @Param 注解，则会报错
+
+
+
+
+
+
+
+
+
+
+
+
