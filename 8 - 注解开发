@@ -1,0 +1,18 @@
+使用注解开发会比配置文件开发更加方便
+
+@Select("select * from tb_user where id = #{id}")
+public User selectByld(int id);//接口重写方法
+
+查询:@Select
+添加:@lnsert
+修改:@Update
+删除:@Delete
+
+提示:
+  注解完成简单功能
+  配置文件完成复杂功能
+
+
+
+使用注解来映射简单语句会使代码显得更加简洁，但对于稍微复杂一点的语句,Java注解不仅力不从心，
+还会让你本就复杂的SL语句更加混乱不堪。因此，如果你儒要做一些很复杂的操作，最好日XML来映尔语句
