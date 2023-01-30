@@ -93,6 +93,244 @@ HTML原代码                                显示结果                       
 &nbsp;                                                                        不断行的空白
 
 
+案例：
+
+<!-- html5 标识 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 页面的字符集 -->
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1>我是标题</h1>
+<h2>我是标题</h2>
+<h3>我是标题</h3>
+<h4>我是标题</h4>
+<h5>我是标题</h5>
+<h6>我是标题</h6>
+
+<hr>
+
+<font face="楷体" size="5" color="#ffc0cb">hahaha</font>
+<!-- font为废弃标签，已经过时，在CSS中可以替代-->
+<!--
+    html 表示颜色：
+       1. 英文单词：red，pink，blue...
+       2. rgb(值1,值2,值3)：值的取值范围：0~255 rgb(255,0,0) 值表示红绿蓝三原色的比例
+       3. #值1值2值3：值的范围为 00~FF（16进制表示）
+-->
+<hr>
+
+<!-- 文字本身具有换行并不会被识别，必须使用换行标签 -->
+
+heiheihei
+hahaha
+
+<hr>
+<p>
+    今天阳光不错。
+</p>
+<p>
+    确实蛮好的！
+</p>
+<hr>
+
+笨蛋<br>
+
+<b>笨蛋</b><br>
+<i>笨蛋</i><br>
+<u>笨蛋</u><br>
+
+
+<hr>
+<center>
+    <b>笨蛋</b>
+</center>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+图片、音频、视频标签:
+
+标签                                    描述
+<img>                                 定义图片
+<audio>                               定义音频
+<video>                               定义视频
+
+img:定义图片
+       src:规定显示图像的URL(统一资源定位符) -- 定位图片
+       height:定义图像的高度
+       width:定义图像的宽度
+       
+audio:定义音频。支持的音频格式: MP3、WAV、OGG
+       src:规定音频的URL
+       controls:显示播放控件 -- 播放按钮
+       
+video:定义视频。支持的音频格式: MP4, WebM、OGG
+       src:规定视频的 URL
+       controls:显示播放控件
+
+
+案例：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--
+    资源路径：
+        1. 绝对路径：完整路径（写起来麻烦，不易于维护）
+        2. 相对路径：相对位置关系
+           xxx/html/02 - 图片音频视频.html  (前提条件)
+           xxx/html/a.jpg
+
+           同一级目录下：./a.jpg
+                      a.jpg
+
+
+           假设图片放于当前目录下的img文件中：
+            ./img/a.jpg
+            img/a.jpg
+
+            假设图片放于另一个目录文件中：
+            xxx/img/a.jpg
+            ../img/a.jpg
+
+    尺寸单位：
+        1. px：像素（数字）
+        2. 百分比（写法：50%）
+-->
+
+
+<img src="a.jpg" width="200" height="400">
+
+<audio src="b.mp3" controls="controls"></audio>
+
+<!--语法比较松散，可以直接写成 <audio src="b.mp3" controls></audio> -->
+
+<video src="c.mp4" controls width="500" height="300"></video>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+超链接标签：
+
+标签                                     描述
+<a>                         定义超链接，用于链接到另一个资源
+
+
+href: 指定访问资源的URL
+target: 指定打开资源的方式
+        _self: 默认值，在当前页面打开
+        _blank: 在空白页面打开
+
+
+
+案例：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<a href="https://www.itcast.cn" target="_blank">点我有惊喜</a>
+<!-- 页面内部用_self，跳转到外部资源用_blank -->
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+列表标签：
+
+有序列表(order list)
+
+                  <ol>
+1.咖啡            <li>咖啡</li>
+⒉茶              <i>茶</li>
+3.牛奶            <li>牛奶</li>
+                  </ol>
+
+无序列表~(unorder list)
+
+                  <ul> 
+·咖啡             <li>咖啡</li>
+·茶               <i>茶</li>
+·牛奶             <i>牛奶</li>
+                  </ul>
+                  
+                  
+标签                   描述
+<o>                定义有序列表
+<u>                定义无序列表
+<li>                定义列表项
+
+type:设置项目符号
+
+
+
+案例：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<ol type="A">
+    <li>咖啡</li>
+    <li>茶</li>
+    <li>牛奶</li>
+</ol>
+
+<ul type="circle"> <!--项目标识符一般是不需要的，建议使用CSS样式代替 -->
+    <li>咖啡</li>
+    <li>茶</li>
+    <li>牛奶</li>
+</ul>
+
+</body>
+</html>
 
 
 
@@ -105,8 +343,294 @@ HTML原代码                                显示结果                       
 
 
 
+表格标签：
+
+标签                                  描述
+<table>                             定义表格
+<tr>                                 定义行
+<td>                               定义单元格
+<th>                             定义表头单元格
 
 
+table: 定义表格
+    border: 规定表格边框的宽度
+    width : 规定表格的宽度
+    cellspacing: 规定单元格之间的空白
+
+tr: 定义行
+    align: 定义表格行的内容对齐方式
+
+td: 定义单元格
+    rowspan: 规定单元格可横跨的行数（纵向合并）
+    colspan: 规定单元格可横跨的列数（横向合并）
+
+
+案例：
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<table border="1" cellspacing="0" width="50%">
+    <tr align="center">
+        <th>序号</th>
+        <th>品牌logo</th>
+        <th>品牌名称</th>
+        <th>企业名称</th>
+
+    </tr>
+
+    <tr align="center">
+        <td>010</td>
+        <td><img src="../img/三只松鼠.png" width="60" height="50"> </td>
+        <td>三只松鼠</td>
+        <td>三只松鼠</td>
+    </tr>
+
+    <tr align="center">
+        <td>010</td>
+        <td><img src="../img/优衣库.png" width="60" height="50"> </td>
+        <td>优衣库</td>
+        <td>优衣库</td>
+    </tr>
+
+    <tr align="center">
+    <td>010</td>
+    <td><img src="../img/小米.png" width="60" height="50"> </td>
+    <td>小米</td>
+    <td>小米</td>
+</tr>
+
+</table>
+
+<br>
+<hr>
+<br>
+
+<!-- 单元格合并 -->
+
+<table border="1" cellspacing="0" width="50%">
+    <tr align="center">
+
+        <th colspan="2">品牌logo</th>
+        <th>品牌名称</th>
+        <th>企业名称</th>
+
+    </tr>
+
+    <tr align="center">
+        <td>010</td>
+        <td><img src="../img/三只松鼠.png" width="60" height="50"> </td>
+        <td>三只松鼠</td>
+        <td>三只松鼠</td>
+    </tr>
+
+    <tr align="center">
+        <td rowspan="2">011</td>
+        <td><img src="../img/优衣库.png" width="60" height="50"> </td>
+        <td>优衣库</td>
+        <td>优衣库</td>
+    </tr>
+
+    <tr align="center">
+        <td><img src="../img/小米.png" width="60" height="50"> </td>
+        <td>小米</td>
+        <td>小米</td>
+    </tr>
+
+</table>
+</body>
+</html>
+
+
+
+布局标签：
+
+标签                                   描述
+<div>            定义HTML文档中的一个区域部分，经常与CSS一起使用，用来布局网页
+<span>                           用于组合行内元素。
+
+
+div标签占一整行，相当于自动换行
+span为行内标签，不会占一整行
+
+
+案例：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div>我是div</div>
+<div>我是div</div>
+
+<span>我是span</span>
+<span>我是span</span>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+表单标签：
+
+表单: 在网页中主要负责数据采集功能，使用<form>标签定义表单
+表单项(元素): 不同类型的 input 元素、下拉列表、文本域等
+
+
+标签                                                             描述
+<form>                                                         定义表单
+<input>                                             定义表单项，通过type属性控制输入形式
+<label>                                                    为表单项定义标注
+<select>                                                     定义下拉列表
+<option>                                                 定义下拉列表的列表项
+<textarea>                                                    定义文本域
+
+
+form:定义表单
+     action: 规定当提交表单时向何处发送表单数据，URL
+     method: 规定用于发送表单数据的方式
+           get: 浏览器会将数据直接附在表单的action URL之后。大小有限制
+           post: 浏览器会将数据放到http请求消息体中。大小无限制
+
+
+案例：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<!--
+ form:
+     action: 指定表单数据提交的URL
+           * 表单项数据要想被提交，则必须指定其name属性
+     method: 指定表单提交的方式
+         1. get: 默认值
+          * 请求参数会拼接在URL后边
+          * url的长度有限制 4KB
+         2. post:
+          * 请求参数会在http请求协议的请求体中
+          * 请求参数无限制
+
+ -->
+
+<!-- # 表示将表单数据提交到当前http页面 -->
+    <form action="#" method="post">
+        <input type="text" name="username">
+        <input type="submit">
+
+
+    </form>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+表单项标签：
+
+<input>:表单项，通过type属性控制输入形式
+<select>:定义下拉列表，<option>定义列表项
+<textarea>:文本域
+
+
+
+type取值                                                     描述
+text                                               默认值。定义单行的输入字段
+password                                                 定义密码字段
+radio                                                    定义单选按钮
+checkbox                                                  定义复选框
+file                                                   定义文件上传按钮
+hidden                                                定义隐藏的输入字段
+submit                                    定义提交按钮，提交按钮会把表单数据发送到服务器
+reset                                      定义重置按钮，重置按钮会清除表单中的所有数据
+button                                                  定义可点击按钮
+
+
+
+
+案例：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form action="#" method="post">
+    <input type="hidden" name="id" value="123">
+
+
+    <label for="username">用户名：</label>
+    <input type="text" name="username" id="username"><br>
+
+    <label for="password">密码：</label>
+    <input type="password" name="password" id="password"><br>
+
+    性别：
+    <input type="radio" name="gender" value="1" id="male"> <label for="male">男</label>
+    <input type="radio" name="gender" value="2" id="female"> <label for="female">女</label>
+    <br>
+
+    爱好：
+    <input type="checkbox" name="hobby" value="1"> 旅游
+    <input type="checkbox" name="hobby" value="2"> 电影
+    <input type="checkbox" name="hobby" value="3"> 银趴
+    <br>
+
+    头像：
+    <input type="file">
+    <br>
+
+    <!-- 若没加value，会把标签内容提交，即中文，加了后会提交value的内容 -->
+    城市：
+    <select name="city">
+        <option>北京</option>
+        <option value="shanghai">上海</option>
+        <option>广州</option>
+    </select>
+    <br>
+
+    个人描述：
+    <textarea cols="20" rows="1" name="desc"></textarea>
+
+    <br>
+    <input type="submit" value="免费注册">
+    <input type="reset" value="重置">
+    <input type="button" value="一个按钮">
+
+
+</form>
+
+</body>
+</html>
 
 
 
