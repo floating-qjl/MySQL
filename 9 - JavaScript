@@ -1,0 +1,106 @@
+什么是JavaScript?
+
+JavaScript是一门跨平台、面向对象的脚本语言（不需要经过编译），来控制网页行为的，它能使网页可交互
+W3C标准:网页主要由三部分组成
+    结构:HTML
+    表现: cSs
+    行为: JavaScript
+    
+JavaScript和Java是完全不同的语言，不论是概念还是设计。但是基础语法类似。
+
+JavaScript(简称:JS)在1995 年由Brendan Eich 发明，并于1997年成为一部ECMA标准。
+ECMAScript6(ES6)是最新的JavaScript版本(发布于2015年)。
+
+
+
+
+
+
+
+JavaScript 引入方式:
+
+1. 内部脚本:将JS代码定义在HTML页面中
+   在HTML中，JavaScript代码必须位于<script>与</script>标签之间
+   <script>
+       alert("hello JS~");
+   </script>
+   
+   提示:
+       在HTML文档中可以在任意地方，放置任意数量的<script>。
+       一般把脚本置于<body>元素的底部，可改善显示速度，因为脚本执行会拖慢显示
+
+
+
+
+
+
+
+2．外部脚本:将JS代码定义在外部JS文件中，然后引入到HTML页面中
+   外部文件: demo.js     alert("hello JS ~");
+   引入外部js文件        <script src="../js/demo.js"></script>
+   注意:
+       1. 外部脚本不能包含<script>标签
+       2. <script>标签不能自闭合
+
+
+案例：
+
+外部文件demo.js：
+
+alert("hello js");
+
+
+
+
+
+
+HTML文件：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!-- 警告框alert -->
+    <!-- 在语法正确的情况下，script标签可以放于任意位置且任意数量，一般放于<body>底部 -->
+    <script>
+        alert("hello js");
+
+    </script>
+
+
+    <!-- 外部引入不能写成自闭合形式，即<script xxxx />，否则不会生效 -->
+    <script src="../js/demo.js"></script>
+
+
+</head>
+<body>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
