@@ -1,0 +1,166 @@
+CSS 导入方式
+
+CSS导入HTML有三种方式:
+    1．内联样式:在标签内部使用style属性，属性值是CSS属性键值对
+       <div style="color: red">Hello CSS~</div>
+       
+    2. 内部样式:定义<style>标签，在标签内部定义css样式
+       <style type="text/css">
+           div{
+               color: red;
+           }
+       </style>
+       
+    3．外部样式:定义link标签，引入外部的css文件
+       <link rel="stylesheet" href="demo.css">
+       
+    demo.css:
+      div{
+         color:red;
+      }
+
+
+
+
+案例：
+
+
+外部文件 l/demo.css
+
+p{
+    color: red;
+}
+
+
+
+
+HTML文件:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        span{
+            color: red;
+        }
+    </style>
+
+    <link href="../l/demo.css" rel="stylesheet">
+
+</head>
+<body>
+
+
+<div style="color: red">hello  css</div>
+
+<span>hello css </span>
+
+<p>hello css</p>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+CSS选择器：
+
+概念:选择器是选取需设置样式的元素(标签)
+    div{
+        color: red;
+    }
+    
+分类:
+    1. 元素选择器
+       元素名称{color: red;}                           div{color: red;}
+      
+    2. id选择器（唯一选择器）                                       
+       #id属性值{color: red;}                         #name{color: red;}
+                                                      <div id="name">hello css2</div>
+    3．类选择器
+       .class属性值{color: red;}                      .cls{color: red;}
+                                                      <div class="cls">hello css3</div>
+
+
+
+
+案例：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!--  谁的选择范围越小，谁就生效 -->
+    <style>
+        div{
+            color: red;
+        }
+
+        #name{
+            color: blue;
+        }
+
+        .cls{
+            color: pink;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<!--  class选择器可同时选择多个，而id选择器是唯一的 -->
+<div>div1</div>
+<div id="name">div2</div>
+<div class="cls">div3</div>
+
+<span class="cls">span</span>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
