@@ -88,6 +88,279 @@ HTML文件：
 
 
 
+JavaScript基础语法：
+
+书写语法：
+1.区分大小写: 与Java一样，变量名、函数名以及其他一切东西都是区分大小写的
+2.每行结尾的分号可有可无（最好写上）
+3.注释:
+  单行注释: //注释内容
+  多行注释: /*注释内容*/
+4.大括号表示代码块
+
+if(count == 3) {
+  alert(count);
+}
+
+
+
+
+
+
+
+输出语句：
+
+使用window.alert()写入警告框
+使用document.write()写入HTML输出
+使用console.log()写入浏览器控制台
+
+window.alert("hello JS~");//弹出警告框
+document.write("hello JS ~");//写入HTML
+console.log("hello JS ~");//写入控制台
+
+
+
+
+
+
+
+
+变量：
+
+
+JavaScript中用var关键字(variable的缩写)来声明变量
+
+var test = 20;
+test = "张三";
+
+JavaScript是一门弱类型语言，变量可以存放不同类型的值。
+变量名需要遵循如下规则:
+    组成字符可以是任何字母、数字、下划线(_)或美元符号($)
+    数字不能开头
+    建议使用驼峰命名
+    
+ECMAScript6新增了let关键字来定义变量。它的用法类似于var，但是所声明的变量，只在let关键字所在的代码块内有效，且不允许重复声明
+
+ECMAScript6新增了const关键字，用来声明一个只读的常量。一旦声明，常量的值就不能改变。
+
+
+
+注意：
+  var:
+    1．作用域: 全局变量
+    2．变量可以重复定义
+
+
+
+
+
+
+
+
+数据类型：
+
+JavaScript中分为:原始类型和引用类型
+
+5种原始类型:
+    number: 数字（整数、小数、NaN(Not a Number))
+    string: 字符、字符串，单双引皆可
+    boolean: 布尔。true，false
+    null: 对象为空（typeof使用后显示object，起初是JavaScript的一个错误，现在,null被认为是对象的占位符，从而解释了这一矛盾）
+    undefined: 当声明的变量未初始化时，该变量的默认值是undefined
+    
+使用typeof运算符可以获取数据类型
+    alert(typeof age);
+
+
+
+
+
+
+运算符：
+
+一元运算符: ++，--
+算术运算符: +， -， *， /，%
+赋值运算符: =，+=，-=，…
+关系运算符: >，<，>=，<=,!=,==,===...
+逻辑运算符: &&，ll，!
+三元运算符: 条件表达式? true_value : false_value
+
+
+
+案例：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+
+</head>
+<body>
+
+<script>
+
+    /*
+        ==:
+           1. 判断类型是否一样，若不一样，则进行类型转换
+           2. 再去比较其值
+        ===: 全等于
+           1. 判断类型是否一样，如果不一样，直接返回false
+           2. 再去比较其值
+
+    */
+
+    var age1 = 20;
+    var age2 = "20";
+
+    alert(age1 == age2);// true
+    alert(age === ag2);// false
+
+    /*
+    类型转换：
+        其他类型转为number：
+              1. string：按照字符串的字面值，转为数字，若不为数字，则转为NaN，一般使用parseInt方法
+              2. boolean：true 转为1，false 转为0
+    */
+
+    var str = +"abc";//正号，表示转为数字
+    alert(str + 1);
+    alert(parseInt(str) + 1);
+
+
+    /*
+            其他类型转为boolean：
+              1. number：0和NaN转为false，其他的数字转为true
+              2. string：空字符串转为false，其他的字符串转为true
+              3. null：false
+              4. undefined：false
+    */
+
+    var flag = 3;
+
+    if(flag){
+        alert("true");
+    }else{
+        alert("false");
+    }
+
+
+
+    var flag = 3;
+
+    //为了方便一般要使用健壮性判断，即if(str != null && str.length > 0)
+    //现在javascript可以直接转换成if(str)，因为若str是null或为0，则直接是false
+    if(flag){
+        alert("true");
+    }else{
+        alert("false");
+    }
+
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+流程控制语句：
+
+if
+switch
+for
+while
+do...while
+
+
+
+
+
+
+
+
+函数：
+
+函数(方法）是被设计为执行特定任务的代码块
+    定义: JavaScript函数通过function关键词进行定义，语法为:
+          function functionName(参数1,参数2..){
+              要执行的代码
+          }
+          
+    注意:
+         形式参数不需要类型。因为JavaScript是弱类型语言
+         返回值也不需要定义类型，可以在函数内部直接使用return返回即可
+         function add(a,b){
+             return a + b;
+         }
+        
+    调用: 函数名称(实际参数列表);
+         let result = add(1,2);
+
+
+
+案例：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+
+</head>
+<body>
+
+<script>
+
+    //方式一：
+    function add(a, b) {
+        return a + b;
+    }
+
+    var result = add(1, 2);
+    alert(result);
+
+
+
+    //方式二：
+    var add = function (a, b) {
+        return a + b;
+    }
+
+    var result = add(1, 2);
+    alert(result);
+
+
+    //调用：JS中，函数调用可以传递任意个参数
+
+    var result = add(1,2,3);//前两个被接受，后面一个只是传过去了
+    alert(result);
+
+    var result = add(1);//数字1和NaN相加，最后还是NaN，参数个数并不影响函数调用
+    alert(result);
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
 
 
 
