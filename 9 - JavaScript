@@ -360,7 +360,270 @@ do...while
 
 
 
+JavaScript对象：Array、Boolean、Date、Math、Number、string、RegExp、Global
 
+
+
+Array：
+
+JavaScript Array对象用于定义数组。
+定义:
+    var 变量名 = new Array(元素列表); //方式一         var arr = new Array(1,2,3);
+    var 变量名 = [元素列表];          //方式二         var arr = [1,2,3];
+    
+访问:
+    arr[索引] = 值;
+    arr[0] = l;
+    
+注意:JS数组类似于Java集合，长度，类型都可变
+
+变长：
+var arr3 = [1,2,3];
+var arr3[10] = 10;
+alert(arr3[10]);//结果为10
+alert(arr3[9]);//结果为undefined
+
+
+变类型：
+arr3[5]= "hello";//对象中既包含数字类型又可以包含string类型
+
+
+属性：
+constructor                         返回对创建此对象的数组函数的引用。
+length                              设置或返回数组中元素的数目。
+prototype                           使您有能力向对象添加属性和方法。
+
+
+
+方法：
+concat()                               连接两个或更多的数组，并返回结果。
+join()                                 把数组的所有元素放入一个字符串。元素通过指定的分隔符进行分隔。
+pop()                                  删除并返回数组的最后一个元素
+push()                                 向数组的未尾添加一个或更多元素，并返回新的长度。
+reverse()                              颠倒数组中元素的顺序。
+shift()                                删除并返回数组的第一个元素
+slice()                                从某个已有的数组返回选定的元素
+sort()                                 对数组的元素进行排序
+splice()                               删除元素，并向数组添加新元素。
+toSource()                             返回该对象的源代码。
+toString()                             把数组转换为字符串，并返回结果。
+toLocaleString()                       把数组转换为本地数组，并返回结果。
+unshift()                              向数组的开头添加一个或更多元素，并返回新的长度。
+valueOf()                              返回数组对象的原始值
+
+
+
+
+
+
+
+String：
+
+定义:
+    var 变量名 = new String(s);//方式一                     var str = new String("hello");
+    var 变量名 = s;//方式二                                 var str = "hello";
+                                                            var str = 'hello';
+
+属性:
+length                            字符串的长度
+
+方法:
+charAt()                          返回在指定位置的字符。
+indexOf()                         检索字符串。
+trim()                            去除字符串前后两端的空白字符
+
+案例：
+var str4 = '  abc  ';
+alert(1 + str4.trim() + 1);//结果为1abc1
+
+
+
+
+
+
+
+
+自定义对象：
+
+格式：
+var 对象名称 = {
+               属性名称1:属性值1，
+               属性名称2:属性值2,
+               ...
+               函数名称:function(形参列表){}
+               ...
+               };
+               
+
+实例：
+var person = {
+  name:"zhangsan",
+  age:23,
+  eat:function(){
+      alert("干饭~");
+  }
+};
+ 
+alert(person.name);
+alert(person.age);
+person.eat(;
+
+
+
+
+
+
+
+
+
+BOM:
+
+Browser Object Model 浏览器对象模型
+JavaScript将浏览器的各个组成部分封装为对象
+组成:
+    Window: 浏览器窗口对象
+    Navigator: 浏览器对象
+    Screen: 屏幕对象
+    History: 历史记录对象
+    Location: 地址栏对象
+
+
+
+
+
+Window:
+
+获取: 直接使用window，其中window.可以省略
+      window.alert("abc");
+      
+属性: 获取其他BOM对象
+history                              对History对象的只读引用。请参数History对象。
+Navigator                            对Navigator对象的只读引用。请参数Navigator对象。
+Screen                               对Screen对象的只读引用。请参数Screen对象。
+location                             用于窗口或框架的 Location对象。请参阅Location对象。
+
+方法:
+alert()                              显示带有一段消息和一个确认按钮的警告框。
+confirm()                            显示带有一段消息以及确认按钮和取消按钮的对话框。（有返回值，为true和false）
+setInterval()                        按照指定的周期(以毫秒计）来调用函数或计算表达式。（可以循环执行）
+setTimeout()                         在指定的毫秒数后调用函数或计算表达式。(只执行一次)
+
+
+
+案例：
+
+setTimeout(function(){
+    alert("hehe");
+},3000);
+
+setInterval(function(){
+    alert("hehe");
+},3000);
+
+
+
+
+
+
+定时器案例：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<input type="button" onclick="on()" value="开灯">
+<img id="myImage" border="0" src="../imgs/off.gif" style="...">
+<input type="button" onclick="off()" value="关灯">
+
+<script>
+    function on(){
+        document.getElementById('myImage').src = '../imgs/on.gif';
+    }
+
+    function off(){
+        document.getElementById('myImage').src = '../imgs/off.gif';
+    }
+
+    
+    var x = 0;//根据一个变化的数字，产生固定个数的值
+    setInterval(function (){
+      if(x % 2 == 0){
+          on();
+      }else{
+          off();
+      }
+      
+      x++;
+    },1000)
+
+</script>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+History：
+
+获取:使用window.history获取，其中window.可以省略
+    window.history.方法();
+    history.方法();
+
+方法:
+back()                          加载history列表中的前一个URL。
+forward()                       加载history列表中的下一个URL。
+
+
+
+
+
+
+Location:
+
+获取:使用window.location获取，其中window.可以省略
+    window.location.方法();
+    location.方法();
+
+属性:
+href                        设置或返回完整的URL。
+
+
+案例：
+location.href = "https://www.baidu.com";
+
+//3秒跳转到首页
+document.write("3秒跳转到首页... " );
+setTimeout(function(){
+    location.href = "https:/ www.baidu.com"
+},3000);
+
+
+
+
+
+
+
+
+
+DOM：
+
+Document Object Model文档对象模型
+将标记语言的各个组成部分封装为对象
+    Document: 整个文档对象
+    Element: 元素对象
+    Attribute: 属性对象
+    Text: 文本对象
+    Comment: 注释对象
 
 
 
