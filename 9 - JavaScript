@@ -628,6 +628,388 @@ Document Object Model文档对象模型
 
 
 
+JavaScript 通过DOM，就能够对HTML进行操作了
+    改变HTML元素的内容
+    改变HTML元素的样式(CSS)
+    对HTML DOM事件作出反应
+    添加和删除HTML元素
+
+
+
+
+DOM是W3C(万维网联盟)的标准
+DOM定义了访问HTML和XML文档的标准:
+W3C DOM标准被分为3个不同的部分:
+    1. 核心DOM: 针对任何结构化文档的标准模型
+          Document: 整个文档对象
+          Element: 元素对象
+          Attribute: 属性对象
+          Text: 文本对象
+          Comment: 注释对象
+    2. XML DOM: 针对XML文档的标准模型
+    3. HTML DOM: 针对HTML文档的标准模型
+          Image: <img>
+          Button: <input type='button'>
+
+
+
+
+获取上Element：
+
+Element:元素对象
+获取: 使用Document对象的方法来获取
+    1. getElementByld: 根据id属性值获取，返回一个Element对象
+    2. getElementsByTagName: 根据标签名称获取，返回Element对象数组
+    3. getElementsByName: 根据name属性值获取，返回Element对象数组
+    4. getElementsByClassName: 根据class属性值获取，返回Element对象数组
+
+
+
+案例：HTML对象的使用
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<img id="light" src="../img/off.gif"> <br>
+<div class="cls">嘿嘿嘿</div> <br>
+<div class="cls">哈哈哈</div> <br>
+
+<input type="checkbox" name="hobby"> 游戏
+<input type="checkbox" name="hobby"> 电影
+<br>
+
+<script>
+
+    var img = document.getElementById("light");
+    img.src = "../img/on.gif";//利用DOM更改路径
+
+    var divs = document.getElementsByTagName("div")
+    for (let i = 0; i < divs.length; i++) {
+        divs[i].style.color = 'red';//更改div标签内容的样式
+        divs[i].innerHTML = '呵呵';//更改内容
+    }
+    
+    var hobbys = document.getElementsByName("hobby");
+    for (let i = 0; i < hobbys.length; i++) {
+        hobbys[i].checked = "true";//更改是否被选中
+    }
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+事件监听：
+
+事件: HTML事件是发生在HTML元素上的“事情”。比如:
+    按钮被点击
+    鼠标移动到元素之上
+    按下键盘按键
+事件监听: JavaScript可以在事件被侦测到时执行代码
+
+
+
+事件绑定：
+
+事件绑定有两种方式:
+    方式一: 通过HTML标签中的事件属性进行绑定
+        <input type="button" onclick='on()>
+        function on(){
+            alert("我被点了");
+        }
+    方式二: 通过DOM元素属性绑定
+        <input type="button" id="btn">
+        document.getElementByld("btn").onclick = function (){
+            alert("我被点了");
+        }
+
+
+案例：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<input type="button" value="点我" onclick="on()"> <br>
+<!--JS代码和HTML代码耦合在一块，并不好-->
+<input type="button" value="再点我" id="btn">
+
+<script>
+    function on(){
+        alert("我被点了");
+    }
+
+    document.getElementById("btn").onclick = function (){
+        alert("我又被点了");
+    }
+
+</script>
+
+</body>
+</html>
+
+
+
+
+常见事件：
+
+onblur          元素失去焦点。
+onfocus         元素获得焦点。
+onchange        域的内容被改变。
+onclick         当用户点击某个对象时调用的事件句柄。
+onkeydown       某个键盘按键被按下。
+onmouseout      鼠标从某元素移开。
+onmouseover     鼠标移到某元素之上。
+onsubmit        确认按钮被点击。
+
+
+案例：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form id="register" action="#">
+    <input type="text" name="username" />
+
+    <input type="submit" value="提交">
+</form>
+
+<script>
+    document.getElementById("register").onsubmit = function (){
+        
+        return false;//表单不会被提交
+        return true;//表单被提交
+    }
+
+</script>
+
+
+
+
+
+
+正则表达式：
+
+概念:正则表达式定义了字符串组成的规则
+定义:
+    1.直接量:注意不要加引号
+        var reg = /^\w{6,12}$/;
+    2.创建RegExp对象
+        var reg = new RegExp("/^\\w{6,12}$");
+方法:
+    test(str): 判断指定字符串是否符合规则，返回true或false
+
+语法:
+    ^: 表示开始
+    $: 表示结束
+    []: 代表某个范围内的单个字符，比如: [0-9]单个数字字符
+    .: 代表任意单个字符，除了换行和行结束符
+    \w: 代表单词字符: 字母、数字、下划线(_)，相当于[A-Za-z0-9_]
+    \d: 代表数字字符: 相当于[0-9]
+    
+量词:
+    +: 至少一个          var reg = /^\w+$/;
+    *: 零个或多个
+    ?∶零个或一个
+    {x}: x个
+    {m,}: 至少m个
+    {m,n}: 至少m个，最多n个
+
+
+
+
+
+
+
+
+
+
+
+表单验证：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎注册</title>
+    <link href="../css/register.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="form-div">
+    <div class="reg-content">
+        <h1>欢迎注册</h1>
+        <span>已有帐号？</span> <a href="#">登录</a>
+    </div>
+    <form id="reg-form" action="#" method="get">
+
+        <table>
+            <tr>
+                <td>用户名</td>
+                <td class="inputs">
+                    <input name="username" type="text" id="username">
+                    <br>
+                    <span id="username_err" class="err_msg" style="display: none">用户名不符合规则</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>密码</td>
+                <td class="inputs">
+                    <input name="password" type="password" id="password">
+                    <br>
+                    <span id="password_err" class="err_msg" style="display: none">密码格式有误</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>手机号</td>
+                <td class="inputs">
+                    <input name="tel" type="text" id="tel">
+                    <br>
+                    <span id="tel_err" class="err_msg" style="display: none">手机号格式有误</span>
+                </td>
+            </tr>
+        </table>
+
+        <div class="buttons">
+            <input value="注 册" type="submit" id="reg_btn">
+        </div>
+        <br class="clear">
+
+    </form>
+
+</div>
+
+<script>
+
+    // 1.验证用户名是否符合规则
+    //   获取用户名的输入框
+    var usernameInput = document.getElementById("username");
+
+    //绑定onblur事件 失去焦点
+    usernameInput.onblur = checkUsername;
+
+    function checkUsername() {
+        //获取用户输入的用户名
+        var username = usernameInput.value.trim();
+
+        //判断用户名是否符合规则：长度6~12，单词字符组成
+        var reg = /^\w{6,12}$/
+        var flag = reg.test(username);
+
+        if (flag) {
+            //符合规则
+
+            document.getElementById("username_err").style.display = 'none';
+        } else {
+            //不符合规则
+            document.getElementById("username_err").style.display = '';
+        }
+
+        return flag;
+    }
+
+
+    // 2.验证密码是否符合规则
+    //   获取密码的输入框
+    var passwordInput = document.getElementById("password");
+
+    //绑定onblur事件 失去焦点
+    passwordInput.onblur = checkPassword;
+
+    function checkPassword() {
+        //获取用户输入的密码
+        var password = passwordInput.value.trim();
+
+        //判断密码是否符合规则：长度6~12
+        var reg = /^\w{6,12}$/
+        var flag = reg.test(password);
+        if (flag) {
+            //符合规则
+
+            document.getElementById("password_err").style.display = 'none';
+        } else {
+            //不符合规则
+            document.getElementById("password_err").style.display = '';
+        }
+        return flag;
+    }
+
+
+    // 3.验证手机号是否符合规则
+    //   获取手机号的输入框
+    var telInput = document.getElementById("tel");
+
+    //绑定onblur事件 失去焦点
+    telInput.onblur = checkTel;
+
+    function checkTel() {
+        //获取用户输入的手机号
+        var tel = telInput.value.trim();
+
+        //判断手机号是否符合规则：长度11，数字组成，第一位是1
+        var reg = /^[1]\d{10}$/
+        var flag = reg.test(tel);
+        if (flag) {
+            //符合规则
+
+            document.getElementById("tel_err").style.display = 'none';
+        } else {
+            //不符合规则
+            document.getElementById("tel_err").style.display = '';
+        }
+        return flag;
+    }
+
+    //获取表单对象
+    var regForm = document.getElementById("reg-form");
+
+    //绑定onsubmit事件
+    regForm.onsubmit = function () {
+        //挨个判断每一个表单项是否都符合要求，如果有一个不符合，则返回false
+        var flag = checkTel() && checkPassword() && checkUsername();
+        return flag;
+    }
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
