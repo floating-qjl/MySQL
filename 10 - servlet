@@ -1,0 +1,340 @@
+Servlet
+    Servlet是Java提供的一门动态web资源开发技术
+
+
+
+Servlet是JavaEE规范之一，其实就是一个接口，将来我们需要定义Servlet类实现Servlet接口，并由web服务器运行Servlet
+
+
+
+
+
+Servlet 快速入门:
+
+1.创建web项目，导入Servlet依赖坐标
+    <dependency>
+        <groupld>javax.servlet</groupld>
+        <artifactld>javax.servlet-api</artifactld>
+        <version>3.1.0</version>
+        <scope>provided</scope>  //范围在编译和测试有效，运行无效
+    </dependency>
+    
+2．创建: 定义一个类，实现Servlet接口，并重写接口中所有方法，并在service方法中输入一句话
+    public class ServletDemo1 implements Servlet {
+        public void service(){
+    }
+    
+3．配置: 在类上使用@WebServlet注解，配置该Servlet的访问路径
+    @WebServlet("/demo1")
+    public class ServletDemo1 implements Servlet {
+    
+4．访问: 启动Tomcat，浏览器输入URL访问该Servlet
+    http://localhost:8080/web-demo/demo1
+
+
+
+
+
+
+Servlet执行流程：
+
+1. Servlet由谁创建? servlet方法由谁调用?
+   Servlet由web服务器创建，Servlet方法由web服务器调用。
+    
+2. 服务器怎么知道servlet中一定有service方法?
+   因为我们自定义的Servlet，必须实现Servlet接口并复写其方法，而Servlet接口中有service方法
+
+
+
+
+
+
+Servlet生命周期：对象的生命周期指一个对象从被创建到被销毁的整个过程
+
+Servlet运行在Servlet容器(web服务器)中，其生命周期由容器来管理，分为4个阶段:
+
+1. 加载和实例化: 默认情况下，当Servlet第一次被访问时，由容器创建Servlet对象
+
+2. 初始化: 在servlet实例化之后，容器将调用Servlet的init()方法初始化这个对象，完成一些如加载配置文件、创建连接等初始化的工作。该方法只调用一次
+
+3. 请求处理: 每次请求Servlet时，Servlet容器都会调用Servlet的service()方法对请求进行处理。
+
+4. 服务终止: 当需要释放内存或者容器关闭时，容器就会调用Servlet实例的destroy()方法完成资源的释放。
+             在destroy()方法调用之后，容器会释放这个Servlet实例，该实例随后会被Java的垃圾收集器所回收
+
+
+
+@WebServlet(urlPatterns = "/demo",loadOnStartup = 1)
+1. 负整数: 第一次被访问时创建Servlet对象
+2. 0或正整数: 服务器启动时创建Servlet对象，数字越小优先级越高
+
+
+
+
+案例：
+
+@WebServlet(urlPatterns = "/demo1", loadOnStartup = 1)
+//多个参数需要写完整
+
+public class Servletdemo implements Servlet {
+
+    /*
+        初始化方法
+        1. 调用时机：默认情况下，servlet被第一次访问时，调用
+                loadOnStartup：
+        2. 调用次数：1次
+     */
+    @Override
+    public void init(ServletConfig servletConfig) throws ServletException {
+        System.out.println("init...");
+    }
+
+    @Override
+    public ServletConfig getServletConfig() {
+        return null;
+    }
+
+    /*
+     提供服务：
+     1. 调用时机：每一次Servlet被访问时，调用
+     2. 调用次数：多次
+
+     */
+
+    @Override
+    public void service(ServletRequest servletRequest, ServletResponse servletResponse) throws ServletException, IOException {
+        System.out.println("servlet hello world~");
+    }
+
+    @Override
+    public String getServletInfo() {
+        return null;
+    }
+
+    /*
+     * 销毁方法：
+     * 1. 调用时机：内存释放或者服务器关闭的时候，Servlet对象会被销毁，调用
+     *            仅限正常关闭，而非强制关闭
+     * 2. 调用次数：1次
+     * */
+    @Override
+    public void destroy() {
+        System.out.println("destory...");
+    }
+}
+
+
+
+
+Servlet方法介绍：
+
+1. 初始化方法，在Servlet被创建时执行，只执行一次
+   void init(ServletConfig config)
+   
+2. 提供服务方法，每次Servlet被访问，都会调用该方法
+   void service(ServletRequest req, ServletResponse res)
+
+3. 销毁方法，当Servlet被销毁时，调用该方法。在内存释放或服务器关闭时销毁Servlet
+   void destroy()
+
+4. 获取ServletConfig对象
+   ServletConfig getServletConfig() //利用init中服务器给的ServletConfig对象，扩大其作用域，然后进行返回
+
+5. 获取Servlet信息
+   String getServletInfo()
+
+
+
+
+
+
+
+Servlet体系结构：
+
+Servlet                               Servlet体系根接口
+GenericServlet                        Servlet抽象实现类
+HttpServlet                           对HTTP协议封装的Servlet实现类
+
+
+
+我们将来开发B/S架构的web项目，都是针对HTTP协议，所以我们自定义Servlet，会继承HttpServlet
+
+
+案例：
+
+@WebServlet("/demo2")
+public class Servletdemo2 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("get");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("post");
+    }
+}
+
+
+
+总结：
+
+1. HttpServlet使用步骤
+   继承HttpServlet
+   重写doGet和doPost方法
+   
+2. HttpServlet原理
+   获取请求方式，并根据不同的请求方式，调用不同的doXxx方法
+
+
+
+
+
+
+
+
+Servlet urlPattern配置：
+
+Servlet要想被访问，必须配置其访问路径(urlPattern)
+
+1．一个Servlet，可以配置多个urlPattern
+   @WebServlet(urlPatterns = {"/demo1","/demo2"})
+
+2. urlPattern配置规则
+   精确匹配:
+       配置路径: @WebServlet("/user/select")
+       访问路径: localhost:8080/web-demo/user/select
+       即两者一致
+       
+   目录匹配:
+       配置路径: @WebServlet("/user/*")
+       访问路径: localhost:8080/web-demo/user/aaa
+                 localhost:8080/web-demo/user/bbb
+                 
+   扩展名匹配:
+       配置路径: @WebServlet("*.do")  //不能以斜杠开头
+       访问路径: localhost:8080/web-demo/aaa.do
+                 localhost:8080/web-demo/bbb.do
+                 
+   任意匹配:
+       配置路径: aWebServlet( "/ ")
+                 awebServlet( "/*")
+       访问路径: localhost:8080/web-demo/hehe
+                 localhost:8080/web-demd/haha
+       /和/*区别:
+                 当我们的项目中的Servlet配置了"/"，会覆盖掉tomcat中的DefaultServlet，当其他的url-pattern都匹配不上时都会走这个Servlet
+                 当我们的项目中配置了“/*”，意味着匹配任意访问路径
+
+优先级:
+
+精确路径 > 目录路径 > 扩展名路径 > /* > /
+
+
+
+
+
+
+XML配置方法编写Servlet
+
+Servlet 从3.0版本后开始支持使用注解配置，3.0版本前只支持XML配置文件的配置方式
+  步骤:
+      1. 编写Servlet类
+      2．在web.xml中配置该Servlet
+
+
+案例：
+
+web.xml中的代码：
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <!--
+        Servlet 全类名
+    -->
+    <servlet>
+        <servlet-name>demo3</servlet-name>
+        <servlet-class>com.deatj.web.Servletdemo3</servlet-class>
+    </servlet>
+
+    <!--
+        Servlet 访问路径
+    -->
+    <servlet-mapping>
+        <servlet-name>demo3</servlet-name>
+        <url-pattern>/demo3</url-pattern>
+    </servlet-mapping>
+</web-app>
+
+
+
+Servledemo3中的代码：
+
+public class Servletdemo3 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("demo3 get...");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doPost(req, resp);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
