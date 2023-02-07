@@ -1,0 +1,543 @@
+Request:获取请求数据
+Response:设置响应数据
+
+
+
+
+
+
+
+Request继承体系:
+
+ServletRequest                 Java提供的请求对象根接口
+HttpServletRequest             Java提供的对Http协议封装的请求对象接口
+RequestFacade                  Tomcat定义的实现类（因为是Tomcat对传输数据进行解析）
+
+1. Tomcat需要解析请求数据，封装为request对象，并且创建request对象传递到service方法中
+2. 使用request对象，查阅JavaEE API文档的HttpServletRequest接口即可
+
+
+
+
+
+
+
+
+
+
+Request获取请求数据：
+
+请求数据分为3部分:
+
+1．请求行: GET/request-demo/req1?username=zhangsan HTTP/1.1    （请求方式/请求路径/请求参数/协议）
+
+           String getMethod(): 获取请求方式: GET
+           String getContextPath(): 获取虚拟目录(项目访问路径 - 动态获取): /request-demo
+           StringBuffer getRequestURL(): 获取URL(统一资源定位符): http://localhost:8080/request-demo/req1
+           String getRequestURI(): 获取URI(统一资源标识符): /request-demo/req1
+           String getQueryString(): 获取请求参数（GET方式): username=zhangsan&password=123
+
+案例：
+
+@WebServlet("/req1")
+public class RequestDemo1 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String method = req.getMethod();
+        System.out.println(method);
+
+        String contextPath = req.getContextPath();
+        System.out.println(contextPath);
+
+        StringBuffer requestURL = req.getRequestURL();
+        System.out.println(requestURL);
+
+        String requestURI = req.getRequestURI();
+        System.out.println(requestURI);
+
+        String queryString = req.getQueryString();
+        System.out.println(queryString);
+    }
+}
+
+
+
+2. 请求头: User-Agent: Mozilla/5.0 Chrome/91.0.4472.106
+
+           String getHeader(String name):根据请求头名称，获取值
+
+案例：
+
+        //user-agent: 浏览器的版本信息
+        String header = req.getHeader("user-agent");
+        System.out.println(header);
+
+
+
+3．请求体: username=superbaby&password=123
+
+           ServletInputStream getInputStream(): 获取字节输入流
+           BufferedReader getReader(): 获取字符输入流
+
+案例：
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        //获取字符输入流
+        BufferedReader br = req.getReader();
+        //读取数据
+        String line = br.readLine();
+        System.out.println(line);
+    }
+
+
+//GET方式通过getQueryString()方法获取，而POST通过输入流来获取
+
+
+
+
+
+Request通用方式获取请求参数：
+
+思考:
+     GET请求方式和POST请求方式区别主要在于获取请求参数的方式不一样，是否可以提供一种统一获取请求参数的方式，从而统一doGet和doPost方法内的代码?
+
+
+
+Map<String, String[ ]>getParameterMap(): 获取所有参数Map集合
+
+String[] getParameterValues(String name): 根据名称获取参数值（数组)
+
+String getParameter(String name):根据名称获取参数值（单个值)
+
+
+
+
+
+
+案例：
+
+@WebServlet("/req1")
+public class RequestDemo1 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        //System.out.println("get...");
+
+        //获取所有参数的Map集合
+        Map<String, String[]> map = req.getParameterMap();
+        for (String key : map.keySet()) {
+            System.out.println(key + ":");
+            //获取值
+            String[] values = map.get(key);
+            for (String value : values) {
+                System.out.print(value + " ");
+            }
+            System.out.println();
+        }
+        System.out.println("-----------");
+
+        //根据key获取参数值，数组
+        String[] hobbies = req.getParameterValues("hobby");
+        for (String hobby : hobbies) {
+            System.out.println(hobby);
+        }
+
+        //根据key，获取单个参数值
+        String username = req.getParameter("username");
+        String password = req.getParameter("password");
+        System.out.println(username);
+        System.out.println(password);
+
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        this.doGet(req,resp);
+
+
+ /*
+        System.out.println("post...");
+
+        //获取所有参数的Map集合
+        Map<String, String[]> map = req.getParameterMap();
+        for (String key : map.keySet()) {
+            System.out.print(key + ": ");
+            //获取值
+            String[] values = map.get(key);
+            for (String value : values) {
+                System.out.print(value + " ");
+            }
+            System.out.println();
+        }
+        System.out.println("-----------");
+
+        //根据key获取参数值，数组
+        String[] hobbies = req.getParameterValues("hobby");
+        for (String hobby : hobbies) {
+            System.out.println(hobby);
+        }
+
+        //根据key，获取单个参数值
+        String username = req.getParameter("username");
+        String password = req.getParameter("password");
+        System.out.println(username);
+        System.out.println(password);
+*/
+
+    }
+}
+
+
+
+使用通用方式获取请求参数后，屏蔽了GET和POST的请求方式代码的不同,可以使用Servlet模板创建Servlet更高效
+
+
+
+
+
+Request请求参数中文乱码处理:
+
+请求参数如果存在中文数据，则会乱码（Tomcat版本较低）
+    解决方案:
+        POST: 设置输入流的编码
+              req.setCharacterEncoding("UTF-8");
+
+        通用方式(GET/POST):先编码，再解码
+              new String(username.getBytes("ISO-8859-1")."UTF-8"");
+
+
+Tomcat 8.0之后，已将GET请求乱码问题解决，设置默认的解码方式为UTF-8
+
+
+URL编码：
+
+1. 将字符串按照编码方式转为二进制（一个中文在UTF-8格式下占三个字节）
+2. 每个字节转为2个16进制数并在前边加上%
+
+
+
+JAVA中使用URL解码编码：
+
+public class URLDemo {
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        String username = "张三";
+
+        //1. URL编码
+        String encode = URLEncoder.encode(username, "utf-8");
+        System.out.println(encode);
+
+        //2. URL解码
+        String decode = URLDecoder.decode(encode, "ISO-8859-1");
+        System.out.println(decode);
+
+        //虽然解码后变成乱码，但是底层的二进制（字节）是一样的
+        //3. 转换为字节数据，编码
+        byte[] bytes = decode.getBytes("ISO-8859-1");
+        for (byte b : bytes) {
+            System.out.print(b + " ");
+        }
+
+        System.out.println();
+
+        //4. 将字节数组转为字符串，解码
+        String s = new String(bytes, "utf-8");
+
+        System.out.println(s);
+    }
+}
+
+
+
+
+即最终解决方案：
+
+@WebServlet("/req2")
+public class RequestDemo2 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //解决乱码：POST，getReader()
+        request.setCharacterEncoding("UTF-8");//设置字符输入流的编码
+
+        //获取usernam
+        String username = request.getParameter("username");
+        System.out.println("解决乱码前：" + username);
+
+        //GET，获取参数的方式：getQueryString，与POST不同
+
+        //乱码原因分析：URL编码使用UTF-8，而解码使用ISO-8859-1的方式，造成乱码
+
+        //先对乱码数据进行编码：转为字节数组
+        //byte[] bytes = username.getBytes(StandardCharsets.ISO_8859_1);
+
+        //字节数组解码
+        //username = new String(bytes, StandardCharsets.UTF_8);
+
+        //缩写成一行，通用解决方案（也可适用于post）
+        username = new String(username.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
+
+        System.out.println("解决乱码后：" + username);
+
+    }
+}
+
+
+
+
+
+
+
+
+Request请求转发：
+
+请求转发(forward): 一种在眠务器内部的咨源跳转方式
+
+实现方式:
+        req.getRequestDispatcher("资源B路径").forward(req,resp);
+
+
+
+
+
+请求转发资源间共享数据:
+    使用Request对象
+        void setAttribute(String name, Object o): 存储数据到request域中
+        Object getAttribute(String name): 根据key，获取值
+        void removeAttribute(String name): 根据key，删除该键值对
+
+
+案例：
+
+@WebServlet("/req3")
+public class RequestDemo3 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("demo3");
+
+        //存储数据
+        request.setAttribute("msg","hello");
+
+        //请求转发
+        request.getRequestDispatcher("/req4").forward(request,response);
+    }
+}
+
+@WebServlet("/req4")
+public class RequestDemo4 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("demo4");
+
+        //获取数据
+        Object msg = request.getAttribute("msg");
+        System.out.println(msg);
+    }
+}
+
+
+
+
+
+请求转发特点:
+    浏览器地址栏路径不发生变化
+    只能转发到当前服务器的内部资源
+    一次请求，可以在转发的资源间使用request共享数据
+
+
+
+
+
+
+Response设置响应数据功能介绍：
+
+响应数据分为3部分:
+    1. 响应行: HTTP/1.1.200 OK（协议/版本号，状态码，状态码描述）
+               void setStatus(int sc) : 设置响应状态码
+
+    2. 响应头: Content-Type:text/html
+               void setHeader(String name, String value) : 设置响应头键值对
+
+    3. 响应体: <html><head>head><body></body></html>
+               PrintWriter getWriter() : 获取字符输出流
+               ServletOutputStream getOutputStream() : 获取字节输出流
+
+
+
+
+Response完成重定向:
+
+重定向(Redirect) : 一种资源跳转方式（资源A处理不了，状态码为：302，告知可以处理的资源B的位置，响应头：location:xxx）
+
+实现方式：
+         resp.setStatus(302);
+         resp.setHeader("location","资源B的路径");
+
+
+案例：
+
+@WebServlet("/resp1")
+public class ResponseDemo1 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("resp1...");
+
+        //重定向
+        //1. 设置响应状态码
+        //response.setStatus(302);
+        //2. 设置响应头 Location，需要加虚拟目录
+        //response.setHeader("Location","/web-demo/resp2");
+
+        //简化方式完成重定向，可以跳转到外部资源
+        //response.sendRedirect("/web-demo/resp2");
+        //response.sendRedirect("https://www.baidu.com");
+        
+        //在pom.xml文件中可以修改虚拟目录，若是改了，则重定向的目录也需要改，耦合性高
+        //因此可以使用 动态获取虚拟目录
+        String contextPath = request.getContextPath();
+        response.sendRedirect(contextPath + "/resp2");
+    }
+}
+
+
+@WebServlet("/resp2")
+public class ResponseDemo2 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("resp2...");
+    }
+}
+
+
+
+重定向特点:（与转发完全相反）
+    浏览器地址栏路径发生变化
+    可以重定向到任意位置的资源（服务器内部、外部均可)
+    两次请求，不能在多个资源使用request共享数据
+
+
+
+
+路径问题：
+
+明确路径谁使用?
+    浏览器使用:需要加虚拟目录(项目访问路径)  //重定向把路径给浏览器，让其访问
+    服务端使用:不需要加虚拟目录              //转发是服务器内部跳转
+
+
+
+练习：
+
+<a href = '路径'>                  //标签，此路径点击之后会跳转到服务器，也就意味着从浏览器发出，需要加虚拟目录
+<form action = '路径'>             //表单，从浏览器发出请求提交到服务器，需要加虚拟目录
+req.getRequestDispatcher("路径")   //转发，服务器内部跳转，不需要加虚拟目录
+resp.sendRedirect("路径")          //重定向，需要加虚拟目录
+
+
+
+
+Response响应字符数据:
+
+使用:
+    1. 通过Response对象获取字符输出流
+       PrintWriter writer = resp.getWriter();
+    2. 写数据
+       writer.write("aaa");
+
+注意:
+    该流不需要关闭，随着响应结束,response对象销毁，由服务器关闭
+    中文数据乱码: 原因通过Response获取的字符输出流默认编码: ISO-8859-1
+    
+    resp.setContentType("text/html;charset=utf-8");
+
+
+案例：
+
+@WebServlet("/resp3")
+public class ResponseDemo3 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //设置字符数据的响应体
+
+        //默认编码是ISO-8859-1，即输出中文会乱码，可以调用方法更换编码
+        //setContentType其实就是在设置头，但是比setHeader要高级一点
+        response.setContentType("text/html;charset=utf-8");
+
+        //1. 获取字符输出流
+        PrintWriter writer = response.getWriter();
+        //浏览器不会识别到标签，当作纯文本，可以使用 content-type 响应头信息
+        //response.setHeader("content-type","text/html");
+        writer.write("你好");
+        writer.write("<h1>aaa</h1>");
+
+        //流不需要关闭，writer随着response获取出来的，当response请求响应结束销毁的时候，writer会随着一起关闭
+
+    }
+}
+
+
+
+
+
+
+Response响应字节数据:
+
+
+使用:
+    1. 通过Response对象获取字符输出流
+       ServletOutputStream outputStream = resp.getOutputStream();
+    2. 写数据
+       outputStream.write(字节数据);
+
+
+lOUtils工具类使用
+    1. 导入坐标
+       <dependency>
+         <groupld>commons-io</groupld>
+         <artifactld>commons-io</artifactld>
+         <version>2.6</version>
+       </dependency>
+    2. 使用
+       IOUtils.copy(输入流,输出流);
+
+
+
+案例：
+
+@WebServlet("/resp4")
+public class ResponseDemo4 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //设置字节数据的响应体
+        //1. 读取文件
+        FileInputStream fs = new FileInputStream("d://2.jpg");
+
+        //2. 获取response字节输出流
+        ServletOutputStream os = response.getOutputStream();
+
+        //3. 完成流的copy
+       /* byte[] buff = new byte[1024];
+        int len = 0;
+        while((len = fs.read(buff)) != -1){
+            os.write(buff,0,len)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ;
+        }*/
+        //利用工具类迅速完成，需要导入依赖坐标
+        IOUtils.copy(fs,os);
+
+        fs.close();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
