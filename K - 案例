@@ -1,0 +1,423 @@
+用户登录
+
+流程说明:
+    1. 用户填写用户名密码，提交到LoginServlet
+    2．在LoginServlet中使用MyBatis查询数据库，验证用户名密码是否正确
+    3. 如果正确，响应“登录成功”，如果错误，响应“登录失败”
+
+
+
+
+准备环境:
+    1．复制资料中的静态页面到项目的webapp目录下
+    2．创建db1数据库，创建tb_user表，创建User实体类
+    3．导入MyBatis坐标，MySQL驱动坐标
+    4. 创建mybatis-config.xml核心配置文件，UserMapper.xml映射文件，UserMapper接口
+
+
+
+
+
+
+
+
+
+
+
+用户注册
+
+流程说明:
+    1．用户填写用户名、密码等信息，点击注册按钮，提交到RegisterServlet
+    2．在 RegisterServlet中使用MyBatis保存数据
+    3．保存前，需要判断用户名是否已经存在: 根据用户名查询数据库
+
+
+
+
+代码：
+
+UserMapper.java（接口）：
+
+public interface UserMapper {
+
+    //根据用户名和密码查询用户对象
+    @Select("select * from tb_user where username = #{username} and password = #{password}")
+    User select(@Param("username") String username, @Param("password") String password);
+    //多个参数，需要加上@Param注解映射
+
+    //根据用户名查询用户对象
+    @Select("select * from tb_user where username = #{username}")
+    User selectByUsername(String username);
+
+    //添加用户
+    @Insert("insert into tb_user values(null,#{username},#{password})")
+    void add(User user);
+}
+
+
+
+
+User.class:（类）
+
+public class User {
+
+    private Integer id;
+    private String username;
+    private String password;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
+}
+
+
+
+
+LoginServlet文件：
+
+@WebServlet("/loginServlet")
+public class LoginServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //接受用户名和密码
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        //调用Mybatis完成查询
+        //获取sqlSessionFactory对象
+        String resource = "mybatis-config.xml";
+        InputStream inputStream = Resources.getResourceAsStream(resource);
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        //获取SqlSession对象
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        //获取Mapper
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        //调用方法
+        User user = userMapper.select(username, password);
+        //释放资源
+        sqlSession.close();
+
+        //获取字符输出流，并设置content type
+        response.setContentType("text/html;charset=utf-8");
+        PrintWriter writer = response.getWriter();
+        //判断user是否为null
+        if (user != null){
+            //登录成功
+            writer.write("登录成功");
+        }else {
+            //登陆失败
+            writer.write("登录失败");
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.doGet(request, response);
+    }
+}
+
+
+
+
+RegisterServlet文件：
+
+@WebServlet("/registerServlet")
+public class RegisterServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //接受用户数据
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        //封装用户对象
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+
+        //获取sqlSessionFactory对象
+        String resource = "mybatis-config.xml";
+        InputStream inputStream = Resources.getResourceAsStream(resource);
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        //获取SqlSession对象
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        //获取Mapper
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+
+        //调用方法
+        User u = userMapper.selectByUsername(username);
+
+        //判断用户对象是否为null
+        if(u == null){
+            //用户名不存在，添加用户
+            userMapper.add(user);
+
+            //提交事务
+            sqlSession.commit();
+            //释放资源
+            sqlSession.close();
+        }else{
+            //用户名存在，给出提示信息
+            response.setContentType("text/html;charset=utf-8");
+            response.getWriter().write("用户名已存在");
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.doGet(request, response);
+    }
+}
+
+
+
+UserMapper.xml文件:
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Death.mapper.UserMapper">
+
+</mapper>
+
+
+
+
+mybatis-config.xml文件：
+
+@WebServlet("/registerServlet")
+public class RegisterServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //接受用户数据
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        //封装用户对象
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+
+        //获取sqlSessionFactory对象
+        String resource = "mybatis-config.xml";
+        InputStream inputStream = Resources.getResourceAsStream(resource);
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        //获取SqlSession对象
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        //获取Mapper
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+
+        //调用方法
+        User u = userMapper.selectByUsername(username);
+
+        //判断用户对象是否为null
+        if(u == null){
+            //用户名不存在，添加用户
+            userMapper.add(user);
+
+            //提交事务
+            sqlSession.commit();
+            //释放资源
+            sqlSession.close();
+        }else{
+            //用户名存在，给出提示信息
+            response.setContentType("text/html;charset=utf-8");
+            response.getWriter().write("用户名已存在");
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.doGet(request, response);
+    }
+}
+
+
+
+login.html文件：
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+    <link href="css/login.css" rel="stylesheet">
+</head>
+
+<body>
+<div id="loginDiv">
+    <form action="/request-demo/loginServlet" method="post" id="form">
+        <h1 id="loginMsg">LOGIN IN</h1>
+        <p>Username:<input id="username" name="username" type="text"></p>
+
+        <p>Password:<input id="password" name="password" type="password"></p>
+
+        <div id="subDiv">
+            <input type="submit" class="button" value="login up">
+            <input type="reset" class="button" value="reset">&nbsp;&nbsp;&nbsp;
+            <a href="register.html">没有账号？点击注册</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
+
+
+
+register.html文件：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎注册</title>
+    <link href="css/register.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="form-div">
+    <div class="reg-content">
+        <h1>欢迎注册</h1>
+        <span>已有帐号？</span> <a href="login.html">登录</a>
+    </div>
+    <form id="reg-form" action="/request-demo/registerServlet" method="post">
+
+        <table>
+
+            <tr>
+                <td>用户名</td>
+                <td class="inputs">
+                    <input name="username" type="text" id="username">
+                    <br>
+                    <span id="username_err" class="err_msg" style="display: none">用户名不太受欢迎</span>
+                </td>
+
+            </tr>
+
+            <tr>
+                <td>密码</td>
+                <td class="inputs">
+                    <input name="password" type="password" id="password">
+                    <br>
+                    <span id="password_err" class="err_msg" style="display: none">密码格式有误</span>
+                </td>
+            </tr>
+
+
+        </table>
+
+        <div class="buttons">
+            <input value="注 册" type="submit" id="reg_btn">
+        </div>
+        <br class="clear">
+    </form>
+
+</div>
+</body>
+</html>
+
+
+
+web.xml文件：
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+</web-app>
+
+
+
+pom.xml文件：
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>request-demo</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <packaging>war</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.20</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+
+
