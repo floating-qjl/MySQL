@@ -1,0 +1,475 @@
+JSP：
+    概念: Java Server Pages，Java服务端页面 
+    一种动态的网页技术，其中既可以定义HTML、JS、CSS等静态内容，还可以定义Java代码的动态内容
+    JSP = HTML + Java
+    JSP的作用: 简化开发，避免了在Servlet中直接输出HTML标签
+
+
+
+
+
+JSP快速入门：
+
+1.导入JSP坐标
+    <dependency>
+        <groupld>javax.servlet.jsp</groupld>
+        <artifactld>jsp-api</artifactld>
+        <version>2.2</version>
+        <scope>provided</scope>
+    </dependency>
+    
+2.创建JSP文件
+
+3.编写HTML标签和Java代码
+    <body>
+        <h1>hello jsp~</h1>
+        <% System.out.printf("jsp hello~");%>
+    </body>
+
+
+
+JSP本质上就是一个Servlet（Tomcat会自动把jsp文件转换成Servlet文件）
+
+JSP在被访问时，由JSP容器(Tomcat)将其转换为Java文件(Servlet)，在由JSP容器(Tomcat)将其编译，最终对外提供服务的其实就是这个字节码文件
+
+
+
+
+
+JSP脚本：
+
+    JSP脚本用于在JSP页面内定义Java代码
+    JSP脚本分类:
+        1. <%y.%>∶内容会直接放到_jspService()方法之中
+        2. <%=....%>:内容会放到out.print()中，作为out.print()的参数
+        3. <%!...%>:内容会放到_jspService()方法之外，被类直接包含
+
+
+
+案例：
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%
+    //查询数据库
+    List<Brand> brands = new ArrayList<Brand>();
+    brands.add(new Brand(1,"三只松鼠","三只松鼠",100,"三只松鼠，好吃不上火",1));
+    brands.add(new Brand(2,"优衣库","优衣库",200,"优衣库，服适人生",0));
+    brands.add(new Brand(3,"小米","小米科技有限公司",1000,"为发烧而生",1));
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input type="button" value="新增"><br>
+<hr>
+<table border="1" cellspacing="0" width="800">
+    <tr>
+        <th>序号</th>
+        <th>品牌名称</th>
+        <th>企业名称</th>
+        <th>排序</th>
+        <th>品牌介绍</th>
+        <th>状态</th>
+        <th>操作</th>
+    </tr>
+
+
+
+    <%
+        for (int i = 0; i < brands.size(); i++) {
+            Brand brand = brands.get(i);
+    %>
+
+    <tr align="center">
+        <td><%=brand.getId()%></td>
+        <td><%=brand.getBrandName()%></td>
+        <td><%=brand.getCompanyName()%></td>
+        <td><%=brand.getOrdered()%></td>
+        <td><%=brand.getDescription()%></td>
+
+        <%
+            if(brand.getStatus() == 1){
+                //显示启用
+        %>
+            <td><%="启用"%></td>
+        <%
+            }else{
+                //显示禁用
+        %>
+            <td><%="禁用"%></td>
+        <%
+            }
+        %>
+        
+        <td><a href="#">修改</a> <a href="#">删除</a></td>
+    </tr>
+
+    <%
+        }
+    %>
+
+
+</table>
+
+</body>
+</html>
+
+
+
+
+
+
+
+JSP缺点：
+
+由于JSP页面内，既可以定义HTML标签，又可以定义Java代码，造成了以下问题:
+    1. 书写麻烦:特别是复杂的页面
+    2．阅读麻烦
+    3. 复杂度高:运行需要依赖于各种环境，JRE，JSP容器，JavaEE...
+    4. 占内存和磁盘:JSP会自动生成.java和.class文件占磁盘，运行的是.class文件占内存
+    5. 调试困难:出错后，需要找到自动生成的.java文件进行调试
+    6. 不利于团队协作:前端人员不会Java，后端人员不精HTML
+    7. ....
+
+
+
+
+
+
+
+EL表达式：
+
+Expression Language表达式语言，用于简化JSP页面内的Java代码
+
+
+主要功能:获取数据
+
+语法: ${expression}
+      ${brands}: 获取域中存储的key为brands的数据
+
+
+
+
+
+JavaWeb中的四大域对象:
+    1. page:当前页面有效
+    2. request:当前请求有效
+    3. session:当前会话有效
+    4. application:当前应用有效
+
+el表达式获取数据，会依次从这4个域中寻找，直到找到为止
+
+
+
+
+
+Servlet文件：
+
+@WebServlet("/demo1")
+public class ServletDemo1 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //准备数据
+        List<Brand> brands = new ArrayList<Brand>();
+        brands.add(new Brand(1,"三只松鼠","三只松鼠",100,"三只松鼠，好吃不上火",1));
+        brands.add(new Brand(2,"优衣库","优衣库",200,"优衣库，服适人生",0));
+        brands.add(new Brand(3,"小米","小米科技有限公司",1000,"为发烧而生",1));
+
+        //存储到request域中
+        request.setAttribute("brands",brands);
+
+        //转发到 el-demo.jsp
+        request.getRequestDispatcher("/el-demo.jsp").forward(request,response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.doGet(request, response);
+    }
+}
+
+
+el-demo文件：
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Title</title>
+</head>
+<body>
+
+    ${brands}
+
+</body>
+</html>
+
+
+
+
+
+JSTL标签：
+
+    JSP标准标签库(Jsp Standarded Tag Library)，使用标签取代JSP页面上的Java代码
+    <c:if test="${flag == 1}">
+        男
+    </c:if>
+    <c:if test="${flag == 2}">
+        女
+    </c:if>
+
+
+
+
+
+
+
+标签                                             描述
+<c:out>                                用于在JSP中显示数据，就像<%= ...>
+<c:set>                                用于保存数据
+<c:remove>                             用于删除数据
+<c:catch>                              用来处理产生错误的异常状况,并且将错误信息储存起来
+<c:if>                                 与我们在一般程序中用的if一样
+<c:choose>                             本身只当做<c:when>和<c:otherwise>的父标签
+<c:when>                               <c:choose>的子标签，用来判断条件是否成立
+<c.otherwise>                          <c:choose>的子标签，接在<c:when>标签后，当<cwhen>标签判断为false时被执行
+<c:import>                             检索一个绝对或相对 URL，然后将其内容暴露给页面
+<c:forEach>                            基础迭代标签,接受多种集合类型
+<c:forTokens>                          根据指定的分隔符来分隔内容并迭代输出
+<c:param>                              用来给包含或重定向的页面传递参数
+<c:redirect>                           重定向至一个新的URL.
+<c:url>                                使用可选的查询参数来创造一个URL
+
+
+
+
+
+
+
+JSTL快速入门:
+
+1．导入坐标
+    <dependency>
+        <groupld>jstl</groupld>
+        <artifactld>jstl<lartifactld>
+        <version>1.2</version>
+    </dependency>
+    <dependency>
+        <groupld>taglibs</groupld>
+        <artifactld>standard</artifactld>
+        <version>1.1.2</version>
+    </dependency>
+2．在JSP页面上引入JSTL标签库
+    <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core”%>
+3．使用
+    <c:if>
+
+
+
+案例：
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<html>
+<head>
+    <title>Title</title>
+</head>
+<body>
+
+<c:if test="true">
+    <h1>true</h1>
+</c:if>
+
+<c:if test="false">
+    <h1>false</h1>
+</c:if>
+
+</body>
+</html>
+
+
+
+
+
+
+<c:forEach>: 相当于for循环
+
+第一种：
+    items: 被遍历的容器
+    var: 遍历产生的临时变量
+    varStatus: 遍历伏态对象
+
+<c:forEach items="${brands}" var="brand">
+    <tr align="center">
+        <td>${brand.id}</td>
+        <td>${brand.brandName}</td>
+        <td>${brand.companyName}</td>
+        <td>${brand.description}</td>
+    </tr>
+</c:forEach>
+
+
+案例：
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@taglib prefix="c" uri ="http://java.sun.com/jsp/jstl/core"%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input type="button" value="新增"><br>
+<hr>
+<table border="1" cellspacing="0" width="800">
+    <tr>
+        <th>序号</th>
+        <th>品牌名称</th>
+        <th>企业名称</th>
+        <th>排序</th>
+        <th>品牌介绍</th>
+        <th>状态</th>
+        <th>操作</th>
+    </tr>
+
+
+
+    <c:forEach items="${brands}" var="brand" varStatus="status">
+        <tr align="center">
+            <%--<td>${brand.id}</td>--%>
+            <td>${status.count}</td>
+            <%--index从0开始，count从1开始--%>
+            <%--实际上是调用的getId()方法，在brand类中自动解析，找到这个方法，并不是变量--%>
+            <td>${brand.brandName}</td>
+            <td>${brand.companyName}</td>
+            <td>${brand.ordered}</td>
+            <td>${brand.description}</td>
+            <c:if test="${brand.status == 1}">
+                <td>启用</td>
+            </c:if>
+
+            <c:if test="${brand.status == 0}">
+                <td>禁用</td>
+            </c:if>
+
+            <td><a href="#">修改</a> <a href="#">删除</a></td>
+        </tr>
+    </c:forEach>
+
+</table>
+
+</body>
+</html>
+
+
+
+
+
+
+第二种：
+    begin: 开始数
+    end: 结束数
+    step: 步长
+
+<c:forEach begin="0" end="10" step="1" var="i">
+    ${i}
+</c:forEach>
+
+
+案例：
+
+<c:forEach begin="0" end="10" step="1" var="i">
+    <a href="#">${i}</a>
+</c:forEach>
+
+
+
+
+
+
+
+
+
+
+MVC模式和三层架构：
+
+
+MVC模式：
+
+MVC是一种分层开发的模式，其中:
+    M: Model，业务模型，处理业务
+    V: View，视图，界面展示
+    C: Controller，控制器，处理请求，调用模型和视图
+
+
+MVC好处：
+    职责单一，互不影响
+    有利于分工协作
+    有利于组件重用
+
+
+
+
+
+
+三层架构：
+    数据访问层: 对数据库的CRUD基本操作
+    业务逻辑层: 对业务逻辑进行封装，组合数据访问层层中基本功能，形成复杂的业务逻辑功能
+    表现层: 接收请求，封装数据，调用业务逻辑层，响应数据
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
