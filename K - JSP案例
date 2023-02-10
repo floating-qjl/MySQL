@@ -1,0 +1,781 @@
+完成品牌数据的增删改查操作：
+
+
+准备环境：
+
+    创建新的模块brand_demo，引入坐标
+    创建三层架构的包结构
+    数据库表tb_brand
+    实体类 Brand
+    MyBatis基础环境
+        Mybatis-config.xml
+        BrandMapper.xml
+        BrandMapper接口
+
+
+
+第一步：查询所有
+
+分析：
+
+Dao层：
+
+BrandMapper接口：
+    List<Brand> selectAll()
+
+
+
+
+Service层：
+
+BrandService方法：
+    selectAll
+    调用brandMapper
+    List<Brand> selectAll()
+
+
+
+
+Web层：
+
+SelectAllServlet文件：
+    1. 调用service查询
+    2. 将数据存入request
+    3. 转发到brand.jsp
+    
+    再利用brand.jsp文件中的<c:foreach>完成查询  
+
+
+
+
+
+代码：
+
+BrandMapper文件：
+
+public interface BrandMapper {
+
+    @Select("select * from tb_brand")
+    @ResultMap("brandResultMap")
+    List<Brand> selectAll();
+}
+
+
+Brand类自行创建
+
+
+
+BrandService文件：
+
+public class BrandService {
+    SqlSessionFactory factory = SqlSessionFactoryUtils.getSqlSessionFactory();
+
+    public List<Brand> selectAll(){
+        //调用BrandMapper.selectAll();
+
+        //获取SqlSession
+        SqlSession sqlSession = factory.openSession();
+        //获取BrandMapper
+        BrandMapper mapper = sqlSession.getMapper(BrandMapper.class);
+        //调用方法
+        List<Brand> brands = mapper.selectAll();
+
+        sqlSession.close();
+
+        return brands;
+    }
+}
+
+
+
+
+SqlSession工具类：
+
+public class SqlSessionFactoryUtils {
+
+    private static SqlSessionFactory sqlSessionFactory;
+
+    static {
+        //静态代码块会随着类的加载而自动执行，且只执行一次
+
+        try {
+            String resource = "mybatis-config.xml";
+            InputStream inputStream = Resources.getResourceAsStream(resource);
+            sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static SqlSessionFactory getSqlSessionFactory(){
+        return sqlSessionFactory;
+    }
+}
+
+
+
+
+SelectAllServlet文件：
+
+@WebServlet("/selectAllServlet")
+public class SelectAllServlet extends HttpServlet {
+    private BrandService service = new BrandService();
+
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        List<Brand> brands = service.selectAll();
+
+        //存入request域
+        request.setAttribute("brands",brands);
+
+        //转发数据
+        request.getRequestDispatcher("/brand.jsp").forward(request,response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.doGet(request, response);
+    }
+}
+
+
+
+
+BrandMapper资源文件：
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Death.mapper.BrandMapper">
+
+<!-- 为了防止数据库和java代码字段冲突，导致页面文字无法显现 -->
+    <resultMap id="brandResultMap" type="brand">
+        <result column="brand_name" property="brandName"></result>
+        <result column="company_name" property="companyName"></result>
+    </resultMap>
+</mapper>
+
+
+
+
+
+mybatis-config配置文件：
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--起别名-->
+    <typeAliases>
+        <package name="com.Death.pojo"/>
+    </typeAliases>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql:///db1?useSSL=false&amp;useServerPrepStmts=true&amp;serverTimezone=Asia/Shanghai"/>
+                <property name="username" value="root"/>
+                <property name="password" value="1234"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <!--扫描mapper-->
+        <package name="com.Death.mapper"/>
+    </mappers>
+</configuration>
+
+
+
+web.xml文件：
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+</web-app>
+
+
+
+
+brand.jsp文件：
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@taglib prefix="c" uri ="http://java.sun.com/jsp/jstl/core"%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input type="button" value="新增"><br>
+<hr>
+<table border="1" cellspacing="0" width="80%">
+    <tr>
+        <th>序号</th>
+        <th>品牌名称</th>
+        <th>企业名称</th>
+        <th>排序</th>
+        <th>品牌介绍</th>
+        <th>状态</th>
+        <th>操作</th>
+    </tr>
+
+
+
+    <c:forEach items="${brands}" var="brand" varStatus="status">
+        <tr align="center">
+            <%--<td>${brand.id}</td>--%>
+            <td>${status.count}</td>
+            <%--index从0开始，count从1开始--%>
+            <%--实际上是调用的getId()方法，在brand类中自动解析，找到这个方法，并不是变量--%>
+            <td>${brand.brandName}</td>
+            <td>${brand.companyName}</td>
+            <td>${brand.ordered}</td>
+            <td>${brand.description}</td>
+            <c:if test="${brand.status == 1}">
+                <td>启用</td>
+            </c:if>
+
+            <c:if test="${brand.status == 0}">
+                <td>禁用</td>
+            </c:if>
+
+            <td><a href="#">修改</a> <a href="#">删除</a></td>
+        </tr>
+    </c:forEach>
+
+</table>
+
+</body>
+</html>
+
+
+
+
+
+index.html文件：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>$Title$</title>
+</head>
+<body>
+
+    <a href="/brand-demo/selectAllServlet">查询所有</a>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+第二部：添加
+
+
+
+分析：
+
+
+Dao层：
+
+BrandMapper文件：
+    void add(brand)
+
+
+
+Service层：
+
+BrandService文件：
+    add
+    调用brandMapper
+    void add(brand)
+
+
+
+
+Web层：
+
+AddServlet文件：
+    1.接收数据，封装Brand对象
+    2.调用service完成添加
+    3.转发到查询所有Servlet（需要更新数据，而不是直接转发到brand.jsp导致数据并未实际添加）
+
+
+
+代码：
+
+BrandMapper文件新增：
+
+ @Insert("insert into tb_brand values(null,#{brandName},#{companyName},#{ordered},#{description},#{status})")
+    void add(Brand brand);//参数只有一个，不需要添加@Param注解
+    
+    
+    
+    
+BrandService文件新增：
+
+    public void add(Brand brand){
+        //获取SqlSession
+        SqlSession sqlSession = factory.openSession();
+        //获取BrandMapper
+        BrandMapper mapper = sqlSession.getMapper(BrandMapper.class);
+        //调用方法
+        mapper.add(brand);
+
+        //提交事务
+        sqlSession.commit();
+
+        sqlSession.close();
+    }
+
+
+
+
+AddServlet文件：
+
+@WebServlet("/addServlet")
+public class AddServlet extends HttpServlet {
+    private BrandService service = new BrandService();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //处理POST请求的乱码问题
+        request.setCharacterEncoding("utf-8");
+
+        //接收表单提交的数据，封装为一个Brand对象
+        String brandName = request.getParameter("brandName");
+        String companyName = request.getParameter("companyName");
+        String ordered = request.getParameter("ordered");
+        String description = request.getParameter("description");
+        String status = request.getParameter("status");
+
+        Brand brand = new Brand();
+        brand.setBrandName(brandName);
+        brand.setCompanyName(companyName);
+        brand.setOrdered(Integer.parseInt(ordered));
+        brand.setStatus(Integer.parseInt(status));
+        brand.setDescription(description);
+
+        //调用service，完成添加
+        service.add(brand);
+
+        //转发到查询所有的Servlet文件
+        request.getRequestDispatcher("/selectAllServlet").forward(request,response);
+
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.doGet(request, response);
+    }
+}
+
+
+
+
+
+addBrand文件：
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>添加品牌</title>
+</head>
+<body>
+<h3>添加品牌</h3>
+<form action="/brand-demo/addServlet" method="post">
+    品牌名称：<input name="brandName"><br>
+    企业名称：<input name="companyName"><br>
+    排序：<input name="ordered"><br>
+    描述信息：<textarea rows="5" cols="20" name="description"></textarea><br>
+    状态：
+    <input type="radio" name="status" value="0">禁用
+    <input type="radio" name="status" value="1">启用<br>
+
+    <input type="submit" value="提交">
+</form>
+</body>
+</html>
+
+
+
+
+brand文件新增：
+
+
+    <input type="button" value="新增" id="add"><br>
+
+
+    <script>
+        document.getElementById("add").onclick = function (){
+            location.href = "/brand-demo/addBrand.jsp"
+        }
+    </script>
+
+
+
+
+
+
+第三步：修改
+
+
+
+
+修改 - 回显：
+
+
+
+Dao层：
+
+BrandMapper文件：
+    Brand selectById(id)
+
+
+
+
+
+Service层：
+
+BrandService文件：
+    selectByld
+    调用brandMapper
+    Brand selectByld(id)
+
+
+
+
+
+Web层：
+
+SelectByldServlet文件
+    1. 接收id
+    2. 调用service查询Brand
+    3. 存储request
+    4. 转发修改页面
+
+
+
+
+
+BrandMapper文件新增：
+
+    @Select("select * from tb_brand where id = #{id}")
+    @ResultMap("brandResultMap")
+    Brand selectById(int id);
+
+
+
+
+BrandService文件新增：
+
+    public Brand selectById(int i){
+        //调用BrandMapper.selectAll();
+
+        //获取SqlSession
+        SqlSession sqlSession = factory.openSession();
+        //获取BrandMapper
+        BrandMapper mapper = sqlSession.getMapper(BrandMapper.class);
+        //调用方法
+        Brand brand = mapper.selectById(i);
+
+        sqlSession.close();
+
+        return brand;
+    }
+    
+    
+
+
+
+
+SelectByIdServlet文件：
+
+@WebServlet("/selectByIdServlet")
+public class SelectByIdServlet extends HttpServlet {
+    private BrandService service = new BrandService();
+
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //接收id
+        String id = request.getParameter("id");
+        //调用service查询
+        Brand brand = service.selectById(Integer.parseInt(id));
+        //存储到request中
+        request.setAttribute("brand",brand);
+
+        //转发到update.jsp
+        request.getRequestDispatcher("/update.jsp").forward(request,response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.doGet(request, response);
+    }
+}
+
+
+
+
+
+
+brand文件新增：
+
+<td><a href="/brand-demo/selectByIdServlet?id=${brand.id}">修改</a> <a href="#">删除</a></td>
+        </tr>
+
+
+
+
+update文件：
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>修改品牌</title>
+</head>
+<body>
+<h3>修改品牌</h3>
+<form action="/brand-demo/addServlet" method="post">
+    品牌名称：<input name="brandName" value="${brand.brandName}"><br>
+    企业名称：<input name="companyName" value="${brand.companyName}"><br>
+    排序：<input name="ordered" value="${brand.ordered}"><br>
+    描述信息：<textarea rows="5" cols="20" name="description">${brand.description} </textarea><br>
+    状态：
+    <c:if test="${brand.status == 0}">
+        <input type="radio" name="status" value="0" checked>禁用
+        <input type="radio" name="status" value="1">启用<br>
+    </c:if>
+
+    <c:if test="${brand.status == 1}">
+        <input type="radio" name="status" value="0">禁用
+        <input type="radio" name="status" value="1" checked>启用<br>
+    </c:if>
+
+    <input type="submit" value="提交">
+</form>
+</body>
+</html>
+
+
+
+
+
+
+
+修改 - 修改：
+
+
+
+Dao层：
+
+BrandMapper文件：
+    void update(brand)
+
+
+
+
+
+Service层：
+
+BrandService文件：
+    update
+    调用brandMapper
+    void update(brand)
+
+
+
+
+
+
+
+Web层：
+
+UpdateServlet文件：
+    1. 接收数据，封装Brand对象
+    ⒉ 调用service修改
+    3.转发到查询所有Servlet
+
+
+
+
+
+
+
+代码：
+
+BrandMapper新增：
+
+    @Update("update tb_brand set brand_name = #{brandName},company_name = #{companyName},ordered = #{ordered},description = #{description},status = #{status} where id = #{id}")
+    void update(Brand brand);
+    
+    
+
+
+
+
+BrandService新增：
+
+
+    public void update(Brand brand){
+        //获取SqlSession
+        SqlSession sqlSession = factory.openSession();
+        //获取BrandMapper
+        BrandMapper mapper = sqlSession.getMapper(BrandMapper.class);
+        //调用方法
+        mapper.update(brand);
+
+        //提交事务
+        sqlSession.commit();
+
+        sqlSession.close();
+    }
+
+
+
+
+
+
+
+
+UpdateServlet文件：
+
+@WebServlet("/updateServlet")
+public class UpdateServlet extends HttpServlet {
+    private BrandService service = new BrandService();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //处理POST请求的乱码问题
+        request.setCharacterEncoding("utf-8");
+
+        //接收表单提交的数据，封装为一个Brand对象
+        String id = request.getParameter("id");
+        String brandName = request.getParameter("brandName");
+        String companyName = request.getParameter("companyName");
+        String ordered = request.getParameter("ordered");
+        String description = request.getParameter("description");
+        String status = request.getParameter("status");
+
+        Brand brand = new Brand();
+        brand.setId(Integer.parseInt(id));
+        brand.setBrandName(brandName);
+        brand.setCompanyName(companyName);
+        brand.setOrdered(Integer.parseInt(ordered));
+        brand.setStatus(Integer.parseInt(status));
+        brand.setDescription(description);
+
+        //调用service，完成修改
+        service.update(brand);
+
+        //转发到查询所有的Servlet文件
+        request.getRequestDispatcher("/selectAllServlet").forward(request,response);
+
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.doGet(request, response);
+    }
+}
+
+
+
+
+
+
+
+
+update文件修改：
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>修改品牌</title>
+</head>
+<body>
+<h3>修改品牌</h3>
+<form action="/brand-demo/updateServlet" method="post">
+    <%-- 隐藏域 --%>
+    <input type="hidden" name="id" value="${brand.id}">
+
+    品牌名称：<input name="brandName" value="${brand.brandName}"><br>
+    企业名称：<input name="companyName" value="${brand.companyName}"><br>
+    排序：<input name="ordered" value="${brand.ordered}"><br>
+    描述信息：<textarea rows="5" cols="20" name="description">${brand.description} </textarea><br>
+    状态：
+    <c:if test="${brand.status == 0}">
+        <input type="radio" name="status" value="0" checked>禁用
+        <input type="radio" name="status" value="1">启用<br>
+    </c:if>
+
+    <c:if test="${brand.status == 1}">
+        <input type="radio" name="status" value="0">禁用
+        <input type="radio" name="status" value="1" checked>启用<br>
+    </c:if>
+
+    <input type="submit" value="提交">
+</form>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
