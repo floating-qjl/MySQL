@@ -1,0 +1,480 @@
+登录注册案例:
+
+需求说明:
+1．完成用户登录功能，如果用户勾选“记住用户”，则下次访问登录页面
+   自动填充用户名密码
+2．完成注册功能，并实现验证码功能
+
+
+
+
+Dao层:
+
+UserMapper文件：
+    User select(username,password)
+
+
+
+
+
+Service层：
+
+UserService文件：
+    login
+    调用userMapper
+    User select(username,password)
+
+
+
+
+
+Web层：
+
+LoginServlet文件：
+    1. 接收用户名和密码
+    2. 调用service查询User
+    3. 判断User是否为null
+
+
+
+
+案例：
+
+
+UserMapper文件：
+
+public interface UserMapper {
+
+
+    /**
+     * 根据用户名和密码查询用户对象
+     * @param username
+     * @param password
+     * @return
+     */
+    @Select("select * from tb_user where username = #{username} and password = #{password}")
+    User select(@Param("username") String username, @Param("password")  String password);
+
+    /**
+     * 根据用户名查询用户对象
+     * @param username
+     * @return
+     */
+    @Select("select * from tb_user where username = #{username}")
+    User selectByUsername(String username);
+
+    /**
+     * 添加用户
+     * @param user
+     */
+    @Insert("insert into tb_user values(null,#{username},#{password})")
+    void add(User user);
+}
+
+
+
+
+
+
+UserService文件：
+
+public class UserService {
+    SqlSessionFactory factory = SqlSessionFactoryUtils.getSqlSessionFactory();
+
+    public User login(String username,String password){
+        //获取SqlSession
+        SqlSession sqlSession = factory.openSession();
+        //获取UserMapper
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        //调用方法
+        User user = mapper.select(username, password);
+        //释放资源
+        sqlSession.close();
+
+        return user;
+    }
+}
+
+
+
+
+
+
+
+
+LoginServlet文件：
+
+@WebServlet("/loginServlet")
+public class LoginServlet extends HttpServlet {
+    private UserService service = new UserService();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //获取用户名和密码
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        //调用service查询
+        User user = service.login(username, password);
+
+        //判断
+        if (user != null){
+            //登录成功，跳转到查询所有的BrandServlet
+
+            //将登录成功后的user对象，存储到session
+            HttpSession session = request.getSession();
+            session.setAttribute("user",user);
+
+            String contextPath = request.getContextPath();
+            response.sendRedirect(contextPath + "/selectAllServlet");
+        }else{
+            //登录失败
+
+            //存储错误信息到request，login_msg为登录提示信息
+            request.setAttribute("login_msg","用户名或密码错误");
+
+            //跳转到login.jsp
+            request.getRequestDispatcher("/login.jsp").forward(request,response);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.doGet(request, response);
+    }
+}
+
+
+
+
+
+
+
+
+
+记住用户：
+
+如果用户勾选“记住用户”，则下次访问登陆页面自动填充用户名密码如何自动填充用户名和密码?
+    1. 将用户名和密码写入Cookie中，并且持久化存储Cookie ，下次访问浏览器会自动携带Cookie
+    2. 在页面获取Cookie数据后，设置到用户名和密码框中
+    
+何时写Cookie?
+    1. 登录成功
+    2. 用户勾选记住用户复选框
+       ${cookie.key.value} //key指存储在cookie中的键名称
+
+
+
+
+案例：
+
+LoginServlet文件：
+
+@WebServlet("/loginServlet")
+public class LoginServlet extends HttpServlet {
+    private UserService service = new UserService();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //获取用户名和密码
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        //获取复选框数据
+        String remember = request.getParameter("remember");
+
+        //调用service查询
+        User user = service.login(username, password);
+
+        //判断
+        if (user != null){
+            //登录成功，跳转到查询所有的BrandServlet
+
+            //判断用户是否勾选“记住我”
+            if("1".equals(remember)){
+                //勾选了，发送cookie
+                //创建Cookie对象
+                Cookie c_password = new Cookie("password",password);
+                Cookie c_username = new Cookie("username",username);
+
+                //设置Cookie的存活时间
+                c_username.setMaxAge(60 * 60);
+                c_password.setMaxAge(60 * 60);
+
+                //发送
+
+                response.addCookie(c_password);
+                response.addCookie(c_username);
+            }
+
+            //将登录成功后的user对象，存储到session
+            HttpSession session = request.getSession();
+            session.setAttribute("user",user);
+
+            String contextPath = request.getContextPath();
+            response.sendRedirect(contextPath + "/selectAllServlet");
+        }else{
+            //登录失败
+
+            //存储错误信息到request，login_msg为登录提示信息
+            request.setAttribute("login_msg","用户名或密码错误");
+
+            //跳转到login.jsp
+            request.getRequestDispatcher("/login.jsp").forward(request,response);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.doGet(request, response);
+    }
+}
+
+
+
+
+
+
+
+login.jsp文件：
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+    <link href="css/login.css" rel="stylesheet">
+</head>
+
+<body>
+<div id="loginDiv" style="height: 350px">
+    <form action="/brand-demo/loginServlet" id="form">
+        <h1 id="loginMsg">LOGIN IN</h1>
+        <div id="errorMsg">${login_msg}</div>
+        <p>Username:<input id="username" name="username" value="${cookie.username.value}" type="text"></p>
+
+        <p>Password:<input id="password" name="password" value="${cookie.password.value}" type="password"></p>
+        <p>Remember:<input id="remember" name="remember" value="1" type="checkbox"></p>
+        <div id="subDiv">
+            <input type="submit" class="button" value="login up">
+            <input type="reset" class="button" value="reset">&nbsp;&nbsp;&nbsp;
+            <a href="register.html">没有账号？</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+注册案例：
+
+注册功能:保存用户信息到数据库
+验证码功能:
+    展示验证码: 展示验证码图片，并可以点击切换
+    校验验证码: 验证码填写不正确，则注册失败
+ 
+    验证码就是使用Java代码生成的一张图片
+    验证码作用: 防止机器自动注册，攻击服务器
+
+
+校验验证码：
+    判断程序生成的验证码和用户输入的验证码是否一样，如果不一样，则阻止注册
+    验证码图片访问和提交注册表单是两次请求，所以要将程序生成的验证码存入Session中
+
+
+
+案例：
+
+
+UserService文件：
+
+public class UserService {
+    SqlSessionFactory factory = SqlSessionFactoryUtils.getSqlSessionFactory();
+
+    public User login(String username,String password){
+        //获取SqlSession
+        SqlSession sqlSession = factory.openSession();
+        //获取UserMapper
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        //调用方法
+        User user = mapper.select(username, password);
+        //释放资源
+        sqlSession.close();
+
+        return user;
+    }
+
+    public boolean register(User user){
+        //获取SqlSession
+        SqlSession sqlSession = factory.openSession();
+        //获取UserMapper
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        //调用方法，判断用户名是否存在
+        User u = mapper.selectByUsername(user.getUsername());
+
+        if (u == null){
+            //用户名不存在，注册
+            mapper.add(user);
+            sqlSession.commit();
+        }
+
+        //释放资源
+        sqlSession.close();
+
+        return u == null;
+    }
+}
+
+
+
+
+
+RegisterServlet文件：
+
+@WebServlet("/registerServlet")
+public class RegisterServlet extends HttpServlet {
+    private UserService service = new UserService();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //获取用户名和密码
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        //获取用户填写的验证码
+        String checkCode = request.getParameter("checkCode");
+
+        //获取程序生成的验证码，从Session获取
+        HttpSession session = request.getSession();
+        String checkCodeGen = (String) session.getAttribute("checkCodeGen");
+
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+
+        //比对验证码
+        if(!checkCodeGen.equalsIgnoreCase(checkCode)){
+
+            request.setAttribute("register_msg", "验证码错误");
+            request.getRequestDispatcher("/register.jsp").forward(request, response);
+            //不允许注册
+            return;
+        }
+
+
+        //调用service 注册
+        boolean flag = service.register(user);
+        //判断成功与否
+        if (flag) {
+            //注册功能，跳转登陆页面
+
+            request.setAttribute("register_msg", "注册成功，请登录");
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
+        } else {
+            //注册失败，跳转到注册页面
+            request.setAttribute("register_msg", "用户名已存在");
+            request.getRequestDispatcher("/register.jsp").forward(request, response);
+
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.doGet(request, response);
+    }
+}
+
+
+
+
+
+
+CheckCodeUtil工具类文件详见项目
+
+
+
+
+register.jsp文件：
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎注册</title>
+    <link href="css/register.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="form-div">
+    <div class="reg-content">
+        <h1>欢迎注册</h1>
+        <span>已有帐号？</span> <a href="login.html">登录</a>
+    </div>
+    <form id="reg-form" action="/brand-demo/registerServlet" method="post">
+
+        <table>
+
+            <tr>
+                <td>用户名</td>
+                <td class="inputs">
+                    <input name="username" type="text" id="username">
+                    <br>
+                    <span id="username_err" class="err_msg" >${register_msg}</span>
+                </td>
+
+            </tr>
+
+            <tr>
+                <td>密码</td>
+                <td class="inputs">
+                    <input name="password" type="password" id="password">
+                    <br>
+                    <span id="password_err" class="err_msg" style="display: none">密码格式有误</span>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>验证码</td>
+                <td class="inputs">
+                    <input name="checkCode" type="text" id="checkCode">
+                    <img id="checkCodeImg" src="/brand-demo/checkCodeServlet">
+                    <a href="#" id="changeImg" >看不清？</a>
+                </td>
+            </tr>
+
+        </table>
+
+        <div class="buttons">
+            <input value="注 册" type="submit" id="reg_btn">
+        </div>
+        <br class="clear">
+    </form>
+
+</div>
+
+<script>
+    document.getElementById("changeImg").onclick = function (){
+        document.getElementById("checkCodeImg").src = "/brand-demo/checkCodeServlet?" + new Date().getMilliseconds();
+    }
+
+
+
+
+
+</script>
+
+</body>
+</html>
+
+
