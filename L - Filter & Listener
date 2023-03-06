@@ -26,6 +26,127 @@ Filter快速入门:
 
 
 
+Filter拦截配置：
+
+Filter可以根据需求，配置不同的拦截资源路径
+    @WebFilter("/*")
+    public class FilterDemo
+    
+  拦截具体的资源: /index.jsp: 只有访问index.jsp时才会被拦截。
+  目录拦截: /user/*: 访问/user下的所有资源，都会被拦截
+  后缀名拦截: *.jsp: 访问后缀名为jsp的资源，都会被拦截
+  拦截所有: /*: 访问所有资源，都会被拦截
+
+
+
+
+过滤器链：
+    一个Web应用，可以配置多个过滤器，这多个过滤器称为过滤器链
+    注解配置的Filter，优先级按照过滤器类名(字符串)的自然排序
+
+
+
+导入的Filter包路径为javax.servlet
+
+
+模板：
+
+@WebFilter("/*")
+public class FilterDemo implements Filter {
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        //放行前，对request数据进行处理
+        System.out.println("ss");
+
+        //放行
+        chain.doFilter(request,response);
+
+        //放行后
+        System.out.println("zz");
+    }
+
+    @Override
+    public void destroy() {
+
+    }
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+
+    }
+
+}
+
+
+
+
+案例：
+
+
+登录验证
+    需求: 访问服务器资源时，需要先进行登录验证，如果没有登录，则自动跳转到登录页面
+
+
+判断访问的是否是登录相关资源
+    是: 放行
+    不是: 进行登录验证
+    
+判断用户是否登录: session中是否有user对象
+    登录: 直接放行
+    未登录: 跳转到登录页面，并给出提示信息
+
+
+
+代码：
+
+@WebFilter("/*")
+public class LoginFilter implements Filter {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
+        HttpServletRequest req = (HttpServletRequest) request;
+
+        //判断访问资源路径是否和登录注册相关
+        String[] urls = {"/login.jsp","/imgs/","/css/","/loginServlet","/register.jsp","/registerServlet","/checkCodeServlet"};
+
+        //获取当前访问的资源路径
+        String url = req.getRequestURL().toString();
+
+        //循环遍历判断
+        for (String u : urls) {
+            if(url.contains(u)){
+                //找到了
+                //放行
+                chain.doFilter(request, response);
+
+                return;
+            }
+        }
+
+
+        //判断session中是否有user
+        HttpSession session = req.getSession();
+        Object user = session.getAttribute("user");
+
+        //判断user是否为null
+        if(user != null){
+            //登录过了
+            //放行
+            chain.doFilter(request, response);
+        }else{
+            //没有登录，存储提示信息，跳转到登录界面
+            req.setAttribute("login_msg","您尚未登录");
+            req.getRequestDispatcher("/login.jsp").forward(request,response);
+        }
+
+    }
+
+    public void init(FilterConfig config) throws ServletException {
+    }
+
+    public void destroy() {
+    }
+
+}
 
 
 
@@ -33,10 +154,53 @@ Filter快速入门:
 
 
 
+Listener：
+
+
+概念:Listener表示监听器，是JavaWeb三大组件(Servlet、Filter、Listener)之一。
+
+监听器可以监听就是在application,session,request三个对象创建、销毁或者往其中添加修改删除属性时自动执行代码的功能组件
+
+Listener分类: JavaWeb中提供了8个监听器
+
+
+监听器分类                         监听器名称                                         作用
+ServletContext监听         ServletContextListener                      用于对ServletContext对象进行监听(创建、销毁)
+                           ServletContextAttributeListener             对ServletContext对象中属性的监听(增删改属性)
+                       
+Session监听                HttpsessionListener                         对Session对象的整体状态的监听（创建、销毁)
+                           HttpSessionAttributeListener                对Session对象中的属性监听(增删改属性)
+                           HttpsessionBindingListener                  监听对象于Session的绑定和解除
+                           HttpsessionActivationListener               对Session数据的钝化和活化的监听
+
+Request监听                ServletRequestListener                      对Request对象进行监听(创建、销毁)
+                           ServletRequestAttributeListener             对Request对象中属性的监听（增删改属性)
 
 
 
 
+
+ServletContextListener使用:
+    1. 定义类，实现ServletContextListener接口
+    2. 在类上添加@WebListener注解
+
+
+
+模板：
+
+@WebListener
+public class ContextLoaderListener implements ServletContextListener {
+    @Override
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
+        //加载资源
+        System.out.println("Listener.......");
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent servletContextEvent) {
+        //释放资源
+    }
+}
 
 
 
