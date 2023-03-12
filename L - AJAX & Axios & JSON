@@ -271,6 +271,129 @@ Axios快速入门：
     });
 
 
+    //then用于获取对应的响应，参数名随便写
+
+
+
+
+Axios请求方式别名：
+
+为了方便起见，Axios已经为所有支持的请求方法提供了别名。
+
+get(url)               发起GET方式请求
+post(url,请求参数)     发起POST方式请求
+
+
+
+
+发送get请求：
+    axios.get("url")
+        .then(function (resp){
+            alert(resp.data);
+    });
+
+
+发送post请求
+    axios.post("url", "参数")
+        .then(function (resp){
+            alert(resp.data);
+    });
+
+
+
+
+
+
+
+JSON:
+    概念: JavaScript Object Notation。JavaScript 对象表示法
+    由于其语法简单，层次结构鲜明，现多用于作为数据载体，在网络中进行数据传输
+
+
+JSON基本语法：
+
+
+定义:
+var 变量名= {"key1": value1,
+             "key2": value2,
+              ...
+            };
+
+
+获取数据:
+    变量名.key
+    json.name
+
+
+value的数据类型为:
+    数字(整数或浮点数)
+    字符串(在双引号中)
+    逻辑值(true 或 false)
+    数组(在方括号中)
+    对象(在花括号中)
+    null
+
+
+
+
+JSON数据和Java对象转换:
+    请求数据: JSON字符串转为Java对象
+    响应数据: Java对象转为JSON字符串
+
+
+
+
+Fastjson是阿里巴巴提供的一个Java语言编写的高性能功能完善的JSON库，是目前Java语言中最快的JSON库，可以实现Java对象和JSON字符串的相互转换。
+
+使用:
+    1.导入坐标
+    <dependency>
+        <groupld>com.alibaba</groupld>
+        <artifactld>fastjson</artifactld>
+        <version>1.2.62</version>
+    </dependency>
+    
+    2.Java对象转JSON
+    String jsonStr = JSON.toJSONString(obj);
+    
+    3.JSON字符串转Java对象
+    User user = JSON.parseObject(jsonStr, User.class);
+
+
+
+
+
+代码：
+
+ public static void main(String[] args) {
+        //将java对象转为JSON字符串
+        User user = new User();
+        user.setId(1);
+        user.setUsername("zhangsan");
+        user.setPassword("123");
+
+        String jsonString = JSON.toJSONString(user);
+        System.out.println(jsonString);
+
+        //将JSON字符串转为java对象
+
+        User u = JSON.parseObject("{\"id\":1,\"password\":\"123\",\"username\":\"zhangsan\"}",User.class);
+        System.out.println(u);
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
